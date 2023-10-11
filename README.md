@@ -2,7 +2,31 @@
 
 Build cog images deterministically using Nix.
 
-Example (./example-ebsynth/default.nix):
+
+## Example (./torch-demo/default.nix):
+```
+# build the image and stream it to docker
+$ nix build github:yorickvp/cognix#torch-demo.img && ./result | docker load
+
+$ cog predict torch-demo:......
+
+Starting Docker image torch-demo:.... and running setup()...
+Running prediction...
+cuda works!
+
+$ docker image ls torch-demo:....
+REPOSITORY   TAG                                IMAGE ID       CREATED        SIZE
+torch-demo   c209d6h86w7j7ksnjks4rkynjfw3ahwb   8fe343a42975   53 years ago   4.7GB
+
+# explore the contribution of various packages to the image size
+# format: store-path                                                           own-size  size-with-deps
+$ nix path-info ./result -rSsh | sort -hk3
+[..]
+/nix/store/rbrw4jb0bz54kznbwwf47lj7k77jg00j-python3.10-nvidia-cudnn-cu11-8.5.0.96      	 868.8M	   1.4G
+/nix/store/qqrzrbsgzk3bbg1pfficq5l2qnyz2b2k-python3.10-torch-2.0.1                     	   1.3G	   4.3G
+```
+
+## Example (./example-ebsynth/default.nix):
 ```
 $ git clone ...
 $ nix build .#ebsynth-cpu.img && ./result | docker load
@@ -17,7 +41,7 @@ $ cog predict ebsynth-cpu:...... -i style=@...
 
 
 # Not done yet
-- [ ] GPU support
+- [x] GPU support
 - [ ] Automatically parsing cog.yaml
 - [ ] Better ergonomics: module system
 - [ ] Fully sort out cog/r8 compat

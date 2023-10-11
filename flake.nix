@@ -9,5 +9,10 @@
       inherit dream2nix;
       config = (import ./example-ebsynth { inherit pkgs; }).cog;
     });
+    legacyPackages.x86_64-linux.torch-demo = import ./default.nix (rec {
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      inherit dream2nix;
+      config = (import ./torch-demo { inherit pkgs; }).cog;
+    });
   };
 }

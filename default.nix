@@ -4,7 +4,8 @@
 rec {
   img = pkgs.dockerTools.streamLayeredImage {
     inherit (config) name;
-    contents = with pkgs; [ bashInteractive busybox python-env.pyEnv cog_yaml ] ++ config.system_packages;
+    # glibc.out is needed for gpu
+    contents = with pkgs; [ bashInteractive busybox python-env.pyEnv cog_yaml glibc.out ] ++ config.system_packages;
     config = {
       Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
       EXPOSE = 5000;
@@ -14,6 +15,8 @@ rec {
       # todo: extract openapi schema in nix build (optional?)
       Labels."org.cogmodel.config" = builtins.toJSON { inherit (config) build; };
     };
+    # needed for gpu:
+    extraCommands = "mkdir tmp";
   };
   cog_yaml = pkgs.writeTextFile {
     name = "cog.yaml";
@@ -36,6 +39,13 @@ rec {
           requirementsList = [ "cog==0.8.6" ] ++ config.python_packages;
           #requirementsList = [ "${./inputs}/cog-0.0.1.dev-py3-none-any.whl" ];
           flattenDependencies = true; # todo: why?
+          # GPU, see https://github.com/nix-community/dream2nix/issues/698
+          drvs = {
+            torch.env.appendRunpaths = [ "/usr/lib64" ];
+            nvidia-cublas-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
+            nvidia-cudnn-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
+            nvidia-curand-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
+          };
         };
       })
     ];
