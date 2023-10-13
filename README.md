@@ -6,7 +6,7 @@ Build cog images deterministically using Nix.
 ## Example (./torch-demo/default.nix):
 ```
 # build the image and stream it to docker
-$ nix build github:yorickvp/cognix#torch-demo.img && ./result | docker load
+$ nix build github:yorickvp/cognix#torch-demo && ./result | docker load
 
 $ cog predict torch-demo:......
 
@@ -29,7 +29,7 @@ $ nix path-info ./result -rSsh | sort -hk3
 ## Example (./example-ebsynth/default.nix):
 ```
 $ git clone ...
-$ nix build .#ebsynth-cpu.img && ./result | docker load
+$ nix build .#ebsynth-cpu && ./result | docker load
 $ cog predict ebsynth-cpu:...... -i style=@...
 ```
 
@@ -43,7 +43,7 @@ $ cog predict ebsynth-cpu:...... -i style=@...
 # Not done yet
 - [x] GPU support
 - [ ] Automatically parsing cog.yaml
-- [ ] Better ergonomics: module system
+- [x] Better ergonomics: module system
 - [ ] Fully sort out cog/r8 compat
 - [ ] Other python versions than 3.10
 - [ ] System dependencies mapping

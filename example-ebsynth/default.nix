@@ -26,6 +26,5 @@ in {
     python_packages = [ ];
     python_snapshot_date = "2023-10-05";
     predict = "${./predict.py}:Predictor";
-    projectRoot = ./.; # lock file
   };
 }
