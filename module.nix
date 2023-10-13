@@ -19,6 +19,10 @@ let
   mapAttrNames = f: set:
     lib.listToAttrs (map (attr: { name = f attr; value = set.${attr}; }) (lib.attrNames set));
   addLabelPrefix = labels: (mapAttrNames (x: "run.cog.${x}") labels) // (mapAttrNames (x: "org.cogmodel.${x}") labels);
+  # hack: replicate calls "pip -U cog" before starting
+  fakePip = pkgs.writeShellScriptBin "pip" ''
+    echo "$@"
+  '';
 in {
   imports = [
     ./interface.nix
@@ -37,6 +41,7 @@ in {
           busybox
           config.python-env.public.pyEnv
           cog_yaml
+          fakePip
           glibc.out
         ] ++ cfg.system_packages;
       config = {
