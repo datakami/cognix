@@ -21,6 +21,9 @@ in {
     ./interface.nix
     ({ config, ... }: { public.config = config; })
   ];
+  options.openapi-spec = with lib; mkOption {
+    type = types.path;
+  };
   config = {
     public = pkgs.dockerTools.streamLayeredImage {
       inherit (cfg) name;
@@ -42,6 +45,12 @@ in {
         # todo: extract openapi schema in nix build (optional?)
         Labels."org.cogmodel.config" =
           builtins.toJSON { build.gpu = cfg.build.gpu; };
+        Labels."run.cog.config" =
+          builtins.toJSON { build.gpu = cfg.build.gpu; };
+        Labels."run.cog.has_init" = "true";
+        Labels."org.cogmodel.has_init" = "true";
+        Labels."org.cogmodel.openapi_schema" = builtins.readFile config.openapi-spec;
+        Labels."run.cog.openapi_schema" = builtins.readFile config.openapi-spec;
       };
       # needed for gpu:
       extraCommands = "mkdir tmp";
@@ -49,6 +58,10 @@ in {
     lock = {
       inherit (config.python-env.public.config.lock) fields invalidationData;
     };
+    openapi-spec = lib.mkDefault (pkgs.runCommandNoCC "openapi.json" {} ''
+      cd ${cog_yaml}/src
+      ${config.python-env.public.pyEnv}/bin/python -m cog.command.openapi_schema > $out
+    '');
     python-env = {
       imports = [ dream2nix.modules.dream2nix.pip pipOverridesModule ];
       paths = { inherit (config.paths) projectRoot package; };
