@@ -16,6 +16,9 @@ let
     text = builtins.toJSON { inherit (cfg) predict; };
     destination = "/src/cog.yaml";
   };
+  mapAttrNames = f: set:
+    lib.listToAttrs (map (attr: { name = f attr; value = set.${attr}; }) (lib.attrNames set));
+  addLabelPrefix = labels: (mapAttrNames (x: "run.cog.${x}") labels) // (mapAttrNames (x: "org.cogmodel.${x}") labels);
 in {
   imports = [
     ./interface.nix
@@ -43,14 +46,12 @@ in {
         WorkingDir = "/src";
         # todo: my cog doesn't like run.cog.config
         # todo: extract openapi schema in nix build (optional?)
-        Labels."org.cogmodel.config" =
-          builtins.toJSON { build.gpu = cfg.build.gpu; };
-        Labels."run.cog.config" =
-          builtins.toJSON { build.gpu = cfg.build.gpu; };
-        Labels."run.cog.has_init" = "true";
-        Labels."org.cogmodel.has_init" = "true";
-        Labels."org.cogmodel.openapi_schema" = builtins.readFile config.openapi-spec;
-        Labels."run.cog.openapi_schema" = builtins.readFile config.openapi-spec;
+        Labels = addLabelPrefix {
+          has_init = "true";
+          config = builtins.toJSON { build.gpu = cfg.build.gpu; };
+          openapi_schema = builtins.readFile config.openapi-spec;
+          cog_version = "0.8.6";
+        };
       };
       # needed for gpu:
       extraCommands = "mkdir tmp";
