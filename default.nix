@@ -27,11 +27,18 @@ rec {
     text = builtins.toJSON { inherit (config) predict; };
     destination = "/src/cog.yaml";
   };
+  # conditional overrides: only active when a lib is in use
+  pipOverridesModule = { dream2nix, config, lib, ... }: let
+    overrides = import ./overrides.nix;
+    metadata = config.lock.content.fetchPipMetadata.sources;
+  in {
+    pip.drvs = lib.mapAttrs (name: info: overrides.${name} or {}) metadata;
+  };
   python-env = dream2nix.lib.evalModules {
     packageSets.nixpkgs = pkgs;
     modules = [
       ({ dream2nix, ... }: {
-        imports = [ dream2nix.modules.dream2nix.pip ];
+        imports = [ dream2nix.modules.dream2nix.pip pipOverridesModule ];
         paths = {
           inherit projectRoot;
           package = packageDir;
@@ -43,13 +50,7 @@ rec {
           requirementsList = [ "cog==0.8.6" ] ++ config.python_packages;
           #requirementsList = [ "${./inputs}/cog-0.0.1.dev-py3-none-any.whl" ];
           flattenDependencies = true; # todo: why?
-          # GPU, see https://github.com/nix-community/dream2nix/issues/698
-          drvs = {
-            torch.env.appendRunpaths = [ "/usr/lib64" ];
-            nvidia-cublas-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
-            nvidia-cudnn-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
-            nvidia-curand-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
-          };
+          drvs = {};
         };
       })
     ];
