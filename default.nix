@@ -1,6 +1,10 @@
 # usage: $(nix-build -A img) | docker load
 # cog predict ebsynth-cpu:.....
-{ pkgs, dream2nix, config }:
+{ pkgs, dream2nix, projectRoot }:
+packageDir:
+let
+  config = (import packageDir { inherit pkgs; }).cog;
+in
 rec {
   img = pkgs.dockerTools.streamLayeredImage {
     inherit (config) name;
@@ -29,8 +33,8 @@ rec {
       ({ dream2nix, ... }: {
         imports = [ dream2nix.modules.dream2nix.pip ];
         paths = {
-          inherit (config) projectRoot;
-          package = ".";
+          inherit projectRoot;
+          package = packageDir;
         };
         name = "cog-docker-env";
         version = "0.1.0";
