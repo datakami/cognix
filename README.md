@@ -3,7 +3,7 @@
 Build cog images deterministically using Nix.
 
 
-## Example (./torch-demo/default.nix):
+## Example (./examples/torch-demo/default.nix):
 ```
 # build the image and stream it to docker
 $ nix build github:yorickvp/cognix#torch-demo && ./result | docker load
@@ -26,7 +26,7 @@ $ nix path-info ./result -rSsh | sort -hk3
 /nix/store/qqrzrbsgzk3bbg1pfficq5l2qnyz2b2k-python3.10-torch-2.0.1                     	   1.3G	   4.3G
 ```
 
-## Example (./example-ebsynth/default.nix):
+## Example (./examples/ebsynth-cpu/default.nix):
 ```
 $ git clone ...
 $ nix build .#ebsynth-cpu && ./result | docker load
