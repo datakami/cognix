@@ -12,19 +12,16 @@ let
     };
 
   # derivation containing all files in dir, basis of /src
-  entirePackage = pkgs.buildEnv {
-    name = "cog-source";
-    paths = [
-      "${config.paths.projectRoot}/${config.paths.package}"
-    ];
-    extraPrefix = "/src";
+  entirePackage = pkgs.runCommand "cog-source" {
+    src = "${config.paths.projectRoot}/${config.paths.package}";
     nativeBuildInputs = [ pkgs.yj pkgs.jq ];
+  } ''
+    mkdir $out
+    cp -r $src $out/src
+    chmod -R +w $out
     # we have to modify cog.yaml to make sure predict: is in there
-    postBuild = ''
-      yj < $out/src/cog.yaml | jq --arg PREDICT "${config.cog.predict}" '.predict = $PREDICT' > cog.yaml
-      mv cog.yaml $out/src/
-    '';
-  };
+    yj < $src/cog.yaml | jq --arg PREDICT "${config.cog.predict}" '.predict = $PREDICT' > $out/src/cog.yaml
+  '';
   # add org.cogmodel and run.cog prefixes to attr set
   mapAttrNames = f: set:
     lib.listToAttrs (map (attr: { name = f attr; value = set.${attr}; }) (lib.attrNames set));
