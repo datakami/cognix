@@ -1,0 +1,8 @@
+build:
+  gpu: true
+  python_version: "3.10"
+  python_packages:
+    - "http://r2.drysys.workers.dev/torch/torch-2.0.0a0+gite9ebda2-cp310-cp310-linux_x86_64.whl"
+    - "transformers"
+
+predict: "predict.py:Predictor"

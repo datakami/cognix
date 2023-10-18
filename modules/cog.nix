@@ -1,6 +1,6 @@
 { config, lib, dream2nix, pkgs, ... }:
 let
-  cfg = config.cog;
+  cfg = config.cog.build;
 
   # conditional overrides: only active when a lib is in use
   pipOverridesModule = { config, lib, ... }:
@@ -11,11 +11,21 @@ let
       pip.drvs = lib.mapAttrs (name: info: overrides.${name} or { }) metadata;
     };
 
-  cog_yaml = pkgs.writeTextFile {
-    name = "cog.yaml";
-    text = builtins.toJSON { inherit (cfg) predict; };
-    destination = "/src/cog.yaml";
+  # derivation containing all files in dir, basis of /src
+  entirePackage = pkgs.buildEnv {
+    name = "cog-source";
+    paths = [
+      "${config.paths.projectRoot}/${config.paths.package}"
+    ];
+    extraPrefix = "/src";
+    nativeBuildInputs = [ pkgs.yj pkgs.jq ];
+    # we have to modify cog.yaml to make sure predict: is in there
+    postBuild = ''
+      yj < $out/src/cog.yaml | jq --arg PREDICT "${config.cog.predict}" '.predict = $PREDICT' > cog.yaml
+      mv cog.yaml $out/src/
+    '';
   };
+  # add org.cogmodel and run.cog prefixes to attr set
   mapAttrNames = f: set:
     lib.listToAttrs (map (attr: { name = f attr; value = set.${attr}; }) (lib.attrNames set));
   addLabelPrefix = labels: (mapAttrNames (x: "run.cog.${x}") labels) // (mapAttrNames (x: "org.cogmodel.${x}") labels);
@@ -23,6 +33,7 @@ let
   fakePip = pkgs.writeShellScriptBin "pip" ''
     echo "$@"
   '';
+  # resolve system_packages to cognix.systemPackages
   resolvedSystemPackages = map (pkg:
     if lib.isDerivation pkg then pkg else
       config.cognix.systemPackages.${pkg}) cfg.system_packages;
@@ -36,15 +47,15 @@ in {
     type = types.path;
   };
   config = {
-    inherit (cfg) name;
     dockerTools.streamLayeredImage = {
+      passthru.entirePackage = entirePackage;
       # glibc.out is needed for gpu
       contents = with pkgs;
         [
           bashInteractive
           busybox
           config.python-env.public.pyEnv
-          cog_yaml
+          entirePackage
           fakePip
           glibc.out
         ] ++ resolvedSystemPackages;
@@ -57,19 +68,20 @@ in {
         # todo: extract openapi schema in nix build (optional?)
         Labels = addLabelPrefix {
           has_init = "true";
-          config = builtins.toJSON { build.gpu = cfg.build.gpu; };
+          config = builtins.toJSON { build.gpu = cfg.gpu; };
           openapi_schema = builtins.readFile config.openapi-spec;
           cog_version = "0.8.6";
         };
       };
       # needed for gpu:
+      # fixed in https://github.com/NixOS/nixpkgs/pull/260063
       extraCommands = "mkdir tmp";
     };
     lock = {
       inherit (config.python-env.public.config.lock) fields invalidationData;
     };
     openapi-spec = lib.mkDefault (pkgs.runCommandNoCC "openapi.json" {} ''
-      cd ${cog_yaml}/src
+      cd ${entirePackage}/src
       ${config.python-env.public.pyEnv}/bin/python -m cog.command.openapi_schema > $out
     '');
     python-env = {

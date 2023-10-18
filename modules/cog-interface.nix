@@ -6,28 +6,31 @@ let
 in
 {
   options.cog = with lib; {
-    build.gpu = mkEnableOption "GPU support";
     name = mkOption {
       type = types.str;
     };
-    python_version = mkOption {
-      type = types.enum [ "3.8" "3.9" "3.10" "3.11" "3.12" ];
-    };
-    system_packages = mkOption {
-      # strings not supported yet
-      type = types.listOf (types.oneOf [types.path types.str]);
-      default = [];
-    };
-    python_packages = mkOption {
-      type = types.listOf types.str;
-      default = [];
-    };
-    python_snapshot_date = mkOption {
-      type = types.nullOr types.str;
-      default = null;
+    build = {
+      gpu = mkEnableOption "GPU support";
+      python_version = mkOption {
+        type = types.enum [ "3.8" "3.9" "3.10" "3.11" "3.12" ];
+      };
+      system_packages = mkOption {
+        # strings not supported yet
+        type = types.listOf (types.oneOf [types.path types.str]);
+        default = [];
+      };
+      python_packages = mkOption {
+        type = types.listOf types.str;
+        default = [];
+      };
+      python_snapshot_date = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+      };
     };
     predict = mkOption {
-      type = types.path;
+      type = types.str;
+      default = "predict.py:Predictor";
     };
   };
   options.cognix.systemPackages = with lib; mkOption {

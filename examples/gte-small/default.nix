@@ -20,16 +20,11 @@ let
   weights_renamed = toSymlink weights "src/thenlper/gte-small";
 in
 {
-  cog = {
-    build.gpu = false;
+  cog.build = {
     system_packages = [ weights_renamed ];
-    python_version = "3.11";
     python_packages = [
       "--extra-index-url" "https://download.pytorch.org/whl/cpu"
-      "torch==2.0.1"
-      "transformers"
     ];
     python_snapshot_date = "2023-10-05";
-    predict = "${./predict.py}:Predictor";
   };
 }

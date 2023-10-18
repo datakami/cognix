@@ -19,10 +19,5 @@ let
     }) { };
 in {
   cognix.systemPackages.ebsynth = ebsynth;
-  cog = {
-    system_packages = [ "ebsynth" ];
-    python_version = "3.10";
-    python_snapshot_date = "2023-10-05";
-    predict = "${./predict.py}:Predictor";
-  };
+  cog.build.python_snapshot_date = "2023-10-05";
 }

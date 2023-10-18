@@ -42,7 +42,7 @@ $ cog predict ebsynth-cpu:...... -i style=@...
 
 # Not done yet
 - [x] GPU support
-- [ ] Automatically parsing cog.yaml
+- [x] Automatically parsing cog.yaml
 - [ ] Auto-resolving torch/cuda versions
 - [x] Better ergonomics: module system
 - [x] Fully sort out cog/r8 compat
