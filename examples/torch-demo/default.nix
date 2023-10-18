@@ -16,9 +16,7 @@ let
 in
 {
   cog = {
-    name = "torch-demo";
     build.gpu = true;
-    system_packages = [ ];
     python_version = "3.10";
     python_packages = [ smaller_torch "transformers" ];
     python_snapshot_date = "2023-10-05";

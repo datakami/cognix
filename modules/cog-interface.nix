@@ -16,7 +16,7 @@ in
     };
     system_packages = mkOption {
       # strings not supported yet
-      type = types.listOf types.path;
+      type = types.listOf (types.oneOf [types.path types.str]);
       default = [];
     };
     python_packages = mkOption {
@@ -30,6 +30,10 @@ in
     predict = mkOption {
       type = types.path;
     };
+  };
+  options.cognix.systemPackages = with lib; mkOption {
+    default = {};
+    type = types.attrsOf types.package;
   };
   options.python-env = with lib; mkOption {
     type = types.submoduleWith {

@@ -8,6 +8,7 @@ dream2nix.lib.evalModules {
     {
       _module.args = { inherit pkgs; };
       paths = { inherit projectRoot package; };
+      cog.name = pkgs.lib.mkDefault (builtins.baseNameOf package);
     }
   ];
 }

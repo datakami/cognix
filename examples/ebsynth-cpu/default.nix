@@ -18,12 +18,10 @@ let
       '';
     }) { };
 in {
+  cognix.systemPackages.ebsynth = ebsynth;
   cog = {
-    name = "ebsynth-cpu";
-    build.gpu = false;
-    system_packages = [ ebsynth ];
+    system_packages = [ "ebsynth" ];
     python_version = "3.10";
-    python_packages = [ ];
     python_snapshot_date = "2023-10-05";
     predict = "${./predict.py}:Predictor";
   };

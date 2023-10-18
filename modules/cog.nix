@@ -23,6 +23,9 @@ let
   fakePip = pkgs.writeShellScriptBin "pip" ''
     echo "$@"
   '';
+  resolvedSystemPackages = map (pkg:
+    if lib.isDerivation pkg then pkg else
+      config.cognix.systemPackages.${pkg}) cfg.system_packages;
 in {
   imports = [
     ./cog-interface.nix
@@ -44,7 +47,7 @@ in {
           cog_yaml
           fakePip
           glibc.out
-        ] ++ cfg.system_packages;
+        ] ++ resolvedSystemPackages;
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
         EXPOSE = 5000;
