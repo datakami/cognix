@@ -3,7 +3,7 @@ package:
 dream2nix.lib.evalModules {
   packageSets.nixpkgs = pkgs;
   modules = [
-    ./module.nix
+    ./modules/cog.nix
     package
     {
       _module.args = { inherit pkgs; };

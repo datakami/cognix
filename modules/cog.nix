@@ -5,7 +5,7 @@ let
   # conditional overrides: only active when a lib is in use
   pipOverridesModule = { config, lib, ... }:
     let
-      overrides = import ./overrides.nix;
+      overrides = import ./../overrides.nix;
       metadata = config.lock.content.fetchPipMetadata.sources;
     in {
       pip.drvs = lib.mapAttrs (name: info: overrides.${name} or { }) metadata;
@@ -25,15 +25,16 @@ let
   '';
 in {
   imports = [
-    ./interface.nix
+    ./cog-interface.nix
+    ./stream-layered-image.nix
     ({ config, ... }: { public.config = config; })
   ];
   options.openapi-spec = with lib; mkOption {
     type = types.path;
   };
   config = {
-    public = pkgs.dockerTools.streamLayeredImage {
-      inherit (cfg) name;
+    inherit (cfg) name;
+    dockerTools.streamLayeredImage = {
       # glibc.out is needed for gpu
       contents = with pkgs;
         [
