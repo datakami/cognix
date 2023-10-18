@@ -44,10 +44,10 @@ $ cog predict ebsynth-cpu:...... -i style=@...
 - [x] GPU support
 - [ ] Automatically parsing cog.yaml
 - [x] Better ergonomics: module system
-- [ ] Fully sort out cog/r8 compat
+- [x] Fully sort out cog/r8 compat
 - [ ] Other python versions than 3.10
 - [ ] System dependencies mapping
 - [ ] `cog.yaml` run commands
-- [ ] Make `pip install -U cog` work
+- [ ] Support upgrading `cog` at runtime
 - [ ] Injecting weights, probably want to do that outside of nix
-- [ ] Generating openapi.yaml during the build
+- [x] Generating openapi.yaml during the build
