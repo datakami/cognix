@@ -1,6 +1,6 @@
 {
   description = "Building cog images deterministically using Nix";
-  inputs.dream2nix.url = "github:nix-community/dream2nix/5e2577caaf87661e29405db7e117bda57b0e749d";
+  inputs.dream2nix.url = "github:yorickvp/dream2nix/aa9f0d7dcc9ea332946812562e308b28b4a088df";
   inputs.nixpkgs.follows = "dream2nix/nixpkgs";
 
   outputs = { self, dream2nix, nixpkgs }: let

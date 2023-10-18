@@ -190,7 +190,7 @@
       "torch": {
         "sha256": "053e6bf26b69e0f1fa310cac1706152f3e7cfd40e30d6b2d803142d4987c63e4",
         "type": "url",
-        "url": "file:///nix/store/8wdamrrwcqajndkibqs9v5rp2i85077q-torch-wheel/torch-2.0.0a0+gite9ebda2-cp310-cp310-linux_x86_64.whl",
+        "url": "http://r2.drysys.workers.dev/torch/torch-2.0.0a0+gite9ebda2-cp310-cp310-linux_x86_64.whl",
         "version": "2.0.0a0+gite9ebda2"
       },
       "tqdm": {
@@ -355,5 +355,5 @@
       }
     }
   },
-  "invalidationHash": "eb2ea5b188cf3f25f41ce2675392d3971624e969d2da2854ae87a3a869cae119"
+  "invalidationHash": "2b4530bea0e0c6bcf011fcc790ccbf870b8978183942d22b8a81cae6151d6de5"
 }
