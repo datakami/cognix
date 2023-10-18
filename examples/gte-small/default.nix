@@ -26,7 +26,7 @@ in
     python_version = "3.10";
     python_packages = [
       "--extra-index-url" "https://download.pytorch.org/whl/cpu"
-      "torch==2.0.1+cpu"
+      "torch==2.0.1"
       "transformers"
     ];
     python_snapshot_date = "2023-10-05";
