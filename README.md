@@ -43,10 +43,11 @@ $ cog predict ebsynth-cpu:...... -i style=@...
 # Not done yet
 - [x] GPU support
 - [ ] Automatically parsing cog.yaml
+- [ ] Auto-resolving torch/cuda versions
 - [x] Better ergonomics: module system
 - [x] Fully sort out cog/r8 compat
-- [ ] Other python versions than 3.10
-- [ ] System dependencies mapping
+- [x] Other python versions than 3.10
+- [x] System dependencies mapping
 - [ ] `cog.yaml` run commands
 - [ ] Support upgrading `cog` at runtime
 - [ ] Injecting weights, probably want to do that outside of nix

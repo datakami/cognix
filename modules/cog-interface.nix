@@ -11,8 +11,7 @@ in
       type = types.str;
     };
     python_version = mkOption {
-      # not supported yet
-      type = types.enum [ "3.10" ];
+      type = types.enum [ "3.8" "3.9" "3.10" "3.11" "3.12" ];
     };
     system_packages = mkOption {
       # strings not supported yet
@@ -40,13 +39,5 @@ in
       modules = [ dream2nix.modules.dream2nix.core ];
       specialArgs = { inherit packageSets dream2nix; };
     };
-  };
-  config = {
-    assertions = [
-      {
-        assertion = cfg.python_version == "3.10";
-        message = "python_versions other than 3.10 not supported yet";
-      }
-    ];
   };
 }

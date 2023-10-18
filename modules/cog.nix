@@ -77,6 +77,13 @@ in {
       paths = { inherit (config.paths) projectRoot package; };
       name = "cog-docker-env";
       version = "0.1.0";
+      deps.python = {
+        "3.8" = pkgs.python38;
+        "3.9" = pkgs.python39;
+        "3.10" = pkgs.python310;
+        "3.11" = pkgs.python311;
+        "3.12" = pkgs.python312;
+      }.${cfg.python_version};
       pip = {
         pypiSnapshotDate = cfg.python_snapshot_date;
         requirementsList = [ "cog==0.8.6" ] ++ cfg.python_packages;

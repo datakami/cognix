@@ -23,7 +23,7 @@ in
   cog = {
     build.gpu = false;
     system_packages = [ weights_renamed ];
-    python_version = "3.10";
+    python_version = "3.11";
     python_packages = [
       "--extra-index-url" "https://download.pytorch.org/whl/cpu"
       "torch==2.0.1"
