@@ -34,6 +34,19 @@ let
   resolvedSystemPackages = map (pkg:
     if lib.isDerivation pkg then pkg else
       config.cognix.systemPackages.${pkg}) cfg.system_packages;
+
+  proxyLockModule = content: {
+    # we put python env deps in config.python-env
+    # but lock should be top-level
+    disabledModules = [ dream2nix.modules.dream2nix.lock ];
+    options.lock = {
+      fields = lib.mkOption {};
+      invalidationData = lib.mkOption {};
+      content = lib.mkOption {
+        default = content;
+      };
+    };
+  };
 in {
   imports = [
     ./cog-interface.nix
@@ -82,7 +95,11 @@ in {
       ${config.python-env.public.pyEnv}/bin/python -m cog.command.openapi_schema > $out
     '');
     python-env = {
-      imports = [ dream2nix.modules.dream2nix.pip pipOverridesModule ];
+      imports = [
+        dream2nix.modules.dream2nix.pip
+        pipOverridesModule
+        (proxyLockModule config.lock.content)
+      ];
       paths = { inherit (config.paths) projectRoot package; };
       name = "cog-docker-env";
       version = "0.1.0";

@@ -346,5 +346,12 @@
       }
     }
   },
-  "invalidationHash": "db7f2b44b3c6285d0cdd91eecd48059090ad3dc2f62868df9ddc195a5ca53390"
+  "weights": [
+    {
+      "rev": "c20abe89ac0cdf484944ebdc26ecaaa1bfc9cf89",
+      "hash": "sha256-+9iyjUF6DpJD1ISUS4j5vqYzgL9MmlyknAsXu+LDkdA=",
+      "download_files": []
+    }
+  ],
+  "invalidationHash": "614060dd9590acf10389553f430d1bd5c7a78933439bbea806e81d4b1f0a1d5f"
 }

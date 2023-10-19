@@ -50,5 +50,6 @@ $ cog predict ebsynth-cpu:...... -i style=@...
 - [x] System dependencies mapping
 - [ ] `cog.yaml` run commands
 - [ ] Support upgrading `cog` at runtime
-- [ ] Injecting weights, probably want to do that outside of nix
+- [x] Downloading weights at build-time
+- [ ] Downloading weights at run-time (50% done)
 - [x] Generating openapi.yaml during the build

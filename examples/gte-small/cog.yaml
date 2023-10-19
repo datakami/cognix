@@ -6,3 +6,7 @@ build:
     - "transformers"
 
 predict: "predict.py:Predictor"
+
+weights:
+  - src: thenlper/gte-small
+    build_include: ["model.safetensors"]

@@ -13,6 +13,7 @@ dream2nix.lib.evalModules {
   packageSets.nixpkgs = pkgs;
   modules = [
     ./modules/cog.nix
+    ./modules/weights
     (if builtins.pathExists (package + "/default.nix") then package else {})
     {
       _module.args = { inherit pkgs; };
