@@ -3,13 +3,16 @@ import sys
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 import subprocess
-from shutil import rmtree
+from shutil import rmtree, copyfileobj
 from pathlib import Path
-from urllib.request import urlretrieve
+from urllib.request import urlretrieve, urlopen
 from tempfile import TemporaryDirectory
-import os
-import pygit2 as git
 import ssl
+import os
+
+import tempfile
+import pygit2 as git
+from google.cloud import storage
 
 # todo: why is this neccesary :|
 cafile = ssl.get_default_verify_paths().cafile
@@ -105,6 +108,9 @@ def collect_downloads(src, rev, root: Path, files: set[Path]) -> list[Download]:
         downloads.append(Download(get_lfs_file(src, rev, rel), str(rel), lfs_spec["oid"]))
     return downloads
 
+def nix_hash(path: Path):
+    return subprocess.run(["nix", "hash", "path", str(path)], capture_output=True, encoding='utf8').stdout.strip()
+
 def lock(spec: Spec) -> Lock:
     with TemporaryDirectory() as path:
         root = Path(path)
@@ -117,8 +123,7 @@ def lock(spec: Spec) -> Lock:
         for rel in build_files.intersection(download_files):
             print(f"warning: {rel} specified at build and runtime, defaulting to buildtime", file=sys.stderr)
         downloads = collect_downloads(spec.src, rev, root, download_files - build_files)
-        
-        nixHash = subprocess.run(["nix", "hash", "path", str(root)], capture_output=True, encoding='utf8').stdout.strip()
+        nixHash = nix_hash(root)
     return Lock(rev, nixHash, downloads)
 
 def build(root: Path, spec: Spec, lock: Lock):
@@ -128,13 +133,42 @@ def build(root: Path, spec: Spec, lock: Lock):
         print("downloading", download.dest, file=sys.stderr)
         urlretrieve(download.url, str(root / download.dest))
 
+def push(spec: Spec, lock: Lock):
+    storage_client = storage.Client()
+    bucket = storage_client.bucket("replicate-weights")
+    for download in lock.download_files:
+        filename = f'{spec.src.replace("/", "--")}/{lock.rev}/{download.dest}'
+        blob = bucket.blob(filename)
+        if blob.exists():
+            print("already uploaded:", filename, file=sys.stderr)
+            continue
+        with tempfile.TemporaryFile() as tmpfile:
+            # TODO: timeout, retry, progress bar, stream directly
+            print("Uploading", download.dest, file=sys.stderr)
+            with urlopen(download.url) as response:
+                copyfileobj(response, tmpfile)
+            tmpfile.seek(0)
+            blob.upload_from_file(
+                tmpfile,
+                content_type="application/octet-stream"
+            )
+
+def pget(url: str, dest: Path):
+    subprocess.run(["pget", url, "-o", str(dest)], check=True)
+
 def run(root: Path, spec: Spec, lock: Lock):
-    build_files = allglob(root, spec.build_include)
-    download_files = allglob(root, spec.download_include)
-    downloads = collect_downloads(spec.src, rev, root, download_files - build_files)
-    for download in downloads:
-        print("downloading", download.dest, file=sys.stderr)
-        urlretrieve(download.url, str(root / download.dest))
+    for download in lock.download_files:
+        dest = root / spec.src / download.dest
+        if dest.exists():
+            print("Already downloaded", dest, file=sys.stderr)
+            continue
+        tmp_file = dest.with_suffix(dest.suffix + ".tmp")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        # download to temp file, remove first
+        tmp_file.unlink(missing_ok=True)
+        # todo: timeout
+        pget(download.url, tmp_file)
+        tmp_file.rename(dest)
 
 def readJSON(ps: str):
     p = Path(ps)
@@ -157,8 +191,29 @@ if __name__ == '__main__':
                 print(toJSON(lock(Spec(**j))))
         case "build":
             build(Path(sys.argv[2]), Spec(**readJSON(sys.argv[3])), Lock(**readJSON(sys.argv[4])))
+        case "push":
+            specs = readJSON(sys.argv[2])
+            locks = readJSON(sys.argv[3])
+            if type(specs) is not list:
+                specs = [specs]
+                locks = [locks]
+            for spec, lock in zip(specs, locks):
+                spec = Spec(**spec)
+                lock = Lock(**lock)
+                lock.download_files = [Download(**d) for d in lock.download_files]
+                push(spec, lock)
         case "run":
-            run(Path(sys.argv[2]), Spec(**readJSON(sys.argv[3])), Lock(**readJSON(sys.argv[4])))
+            root = Path(sys.argv[2])
+            specs = readJSON(sys.argv[3])
+            locks = readJSON(sys.argv[4])
+            if type(specs) is not list:
+                specs = [specs]
+                locks = [locks]
+            for spec, lock in zip(specs, locks):
+                spec = Spec(**spec)
+                lock = Lock(**lock)
+                lock.download_files = [Download(**d) for d in lock.download_files]
+                run(root, spec, lock)
         case _:
             print("unknown command")
             exit(1)

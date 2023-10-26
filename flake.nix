@@ -14,6 +14,7 @@
         ebsynth-cpu = callCognix ./examples/ebsynth-cpu;
         torch-demo = callCognix ./examples/torch-demo;
         gte-small = callCognix ./examples/gte-small;
+        gte-large = callCognix ./examples/gte-large;
       };
   };
 }

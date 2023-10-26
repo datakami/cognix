@@ -20,7 +20,7 @@ let
   # ./fetchHuggingface.py does the heavy lifting
   # package it and add the right deps (pygit2 and nix hash)
   fetchHuggingface = let
-    interpreter = "${pkgs.python3.withPackages (ps: [ ps.pygit2 ])}/bin/python";
+    interpreter = "${pkgs.python3.withPackages (ps: [ ps.pygit2 ps.google-cloud-storage ])}/bin/python";
   in pkgs.runCommand "fetcher" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
     mkdir -p $out/bin
     makeWrapper ${interpreter} $out/bin/fetchHuggingface \
@@ -35,7 +35,7 @@ let
     pkgs.stdenv.mkDerivation {
       name = "${spec.src}-weights";
       passthru = { inherit spec lock; };
-      nativeBuildInputs = [ fetcher ];
+      nativeBuildInputs = [ config.deps.fetchHuggingface ];
       outputHashAlgo = "sha256";
       outputHashMode = "recursive";
       outputHash = lock.hash;
@@ -72,6 +72,11 @@ in {
         '';
       };
     };
+    public.push-weights = pkgs.writeScript "push-huggingface" ''
+      #!/bin/sh
+      ${config.deps.fetchHuggingface}/bin/fetchHuggingface push \
+        ${toJSONFile "specs.json" weights} ${toJSONFile "lock.json" config.lock.content.weights}
+    '';
     dockerTools.streamLayeredImage = {
       # debug: nix build .#thing.weights
       passthru.weights = weightsEnv;
