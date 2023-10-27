@@ -40,16 +40,19 @@ $ cog predict ebsynth-cpu:...... -i style=@...
 - Better, granular caching: Nix generates a docker image with a layer for every dependency (up to ~limit, then it starts merging cleverly), images sharing dependencies will share layers as well.
 
 
-# Not done yet
+# Checklist
 - [x] GPU support
 - [x] Automatically parsing cog.yaml
-- [ ] Auto-resolving torch/cuda versions
+- [x] Auto-resolving torch/cuda versions
 - [x] Better ergonomics: module system
 - [x] Fully sort out cog/r8 compat
 - [x] Other python versions than 3.10
 - [x] System dependencies mapping
 - [ ] `cog.yaml` run commands
 - [ ] Support upgrading `cog` at runtime
-- [x] Downloading weights at build-time
-- [ ] Downloading weights at run-time (50% done)
+- [x] Downloading weights at build-time ([example](./examples/gte-small/cog.yaml))
+- [x] Uploading weights to gcs bucket (`nix run .#gte-large.push-weights`)
+- [x] Downloading weights at run-time ([example](./examples/gte-large))
 - [x] Generating openapi.yaml during the build
+- [ ] Automatically download weights at run-time
+- [ ] Ergonomic interface
