@@ -11,6 +11,9 @@ in
     };
     build = {
       gpu = mkEnableOption "GPU support";
+      cuda = mkOption {
+        type = types.enum [ null "11.0" "11.1" "11.3" "11.5" "11.6" "11.7" "11.8" "12.1" ];
+      };
       python_version = mkOption {
         type = types.enum [ "3.8" "3.9" "3.10" "3.11" "3.12" ];
       };
@@ -26,6 +29,11 @@ in
       python_snapshot_date = mkOption {
         type = types.nullOr types.str;
         default = null;
+      };
+      python_extra_index_urls = mkOption {
+        type = types.listOf types.str;
+        default = [];
+        apply = lib.unique;
       };
     };
     predict = mkOption {

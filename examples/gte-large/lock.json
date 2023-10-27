@@ -194,10 +194,10 @@
         "version": "0.14.0"
       },
       "torch": {
-        "sha256": "60b21e8db98f7365758a5c218f5dc533d84f046ed0876b4540ba5ba7ef6797d4",
+        "sha256": "143b6c658c17d43376e2dfbaa2c106d35639d615e5e8dec4429cf1e510dd8d61",
         "type": "url",
-        "url": "https://download.pytorch.org/whl/cu117/torch-2.0.1%2Bcu117-cp311-cp311-linux_x86_64.whl",
-        "version": "2.0.1+cu117"
+        "url": "https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp311-cp311-linux_x86_64.whl",
+        "version": "2.0.1+cu118"
       },
       "tqdm": {
         "sha256": "d302b3c5b53d47bce91fea46679d9c3c6508cf6332229aa1e7d8653723793386",
@@ -385,5 +385,5 @@
       ]
     }
   ],
-  "invalidationHash": "37d7713e530933d963bac86a9557b11703cbf2e16263b0efa92ecfab89e10ac1"
+  "invalidationHash": "5a09b6ceb1adf649551517541fa3fc50c4f22cd2b7a240931454757881058efb"
 }
