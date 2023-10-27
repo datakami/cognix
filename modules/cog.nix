@@ -13,7 +13,7 @@ let
 
   # derivation containing all files in dir, basis of /src
   entirePackage = pkgs.runCommand "cog-source" {
-    src = "${config.paths.projectRoot}/${config.paths.package}";
+    src = pkgs.lib.cleanSource "${config.paths.projectRoot}/${config.paths.package}";
     nativeBuildInputs = [ pkgs.yj pkgs.jq ];
   } ''
     mkdir $out
@@ -90,7 +90,7 @@ in {
     lock = {
       inherit (config.python-env.public.config.lock) fields invalidationData;
     };
-    openapi-spec = lib.mkDefault (pkgs.runCommandNoCC "openapi.json" {} ''
+    openapi-spec = lib.mkDefault (pkgs.runCommand "openapi.json" {} ''
       cd ${entirePackage}/src
       ${config.python-env.public.pyEnv}/bin/python -m cog.command.openapi_schema > $out
     '');
