@@ -81,11 +81,11 @@ let cfg = config.dockerTools.streamLayeredImage; in
     };
   };
 
-  config.public = packageSets.nixpkgs.dockerTools.streamLayeredImage {
+  config.public = (packageSets.nixpkgs.dockerTools.streamLayeredImage {
     inherit (config) name;
     inherit (cfg)
       tag fromImage contents config architecture
       created extraCommands fakeRootCommands enableFakechroot
       maxLayers includeStorePaths passthru;
-  };
+  }) // { inherit (config) name; };
 }

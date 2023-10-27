@@ -1,28 +1,34 @@
-{ pkgs, dream2nix, projectRoot }:
-package:
+{ pkgs, dream2nix, ... } @ args:
 let
+  forwardedArgs = builtins.removeAttrs args [
+    "pkgs" "dream2nix"
+  ];
   importYaml = file:
     let
-      json = pkgs.runCommandNoCC "file.json" {} ''
+      json = pkgs.runCommand "file.json" { } ''
         ${pkgs.yj}/bin/yj < ${file} > $out
       '';
-    in
-      (builtins.fromJSON (builtins.readFile json));
-in
+    in (builtins.fromJSON (builtins.readFile json));
+
+  inherit (builtins) pathExists;
+
+in package:
 dream2nix.lib.evalModules {
   packageSets.nixpkgs = pkgs;
   modules = [
     ./modules/cog.nix
     ./modules/weights
-    (if builtins.pathExists (package + "/default.nix") then package else {})
-    {
-      _module.args = { inherit pkgs; };
-      paths = { inherit projectRoot package; };
-      name = pkgs.lib.mkDefault (builtins.baseNameOf package);
-    }
-    (if builtins.pathExists (package + "/cog.yaml") then {
+    (if pathExists (package + "/default.nix") then package else { })
+    forwardedArgs
+    ({ lib, packageSets, ... }: {
+      _module.args.pkgs = packageSets.nixpkgs;
+      paths.package = package;
+      name = lib.mkDefault (baseNameOf package);
+    })
+    (if pathExists (package + "/cog.yaml") then {
       _file = package + "/cog.yaml";
       cog = importYaml (package + "/cog.yaml");
-    } else {})
+    } else
+      { })
   ];
 }

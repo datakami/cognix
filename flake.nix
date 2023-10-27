@@ -3,30 +3,37 @@
   inputs = {
     dream2nix.url = "github:yorickvp/dream2nix";
     nixpkgs.follows = "dream2nix/nixpkgs";
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.follows = "dream2nix/flake-parts";
   };
 
-  outputs = { self, dream2nix, nixpkgs, flake-utils }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
-      let
-        pkgs = import nixpkgs {
-          config.allowUnfree = true;
-          overlays =
-            [ (final: prev: { pget = prev.callPackage ./pkgs/pget.nix { }; }) ];
-          inherit system;
+  outputs = { self, dream2nix, nixpkgs, flake-parts }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
+      # debug = true;
+      perSystem = { system, pkgs, config, ... }:
+        let inherit (config.legacyPackages) callCognix;
+        in {
+          _module.args.pkgs = import nixpkgs {
+            config.allowUnfree = true;
+            inherit system;
+            overlays = [
+              (final: prev: {
+                pget = prev.callPackage ./pkgs/pget.nix { };
+              })
+            ];
+          };
+          legacyPackages = {
+            inherit (pkgs) pget;
+            callCognix = import ./default.nix {
+              inherit pkgs dream2nix;
+              paths.projectRoot = ./.;
+            };
+
+            ebsynth-cpu = callCognix ./examples/ebsynth-cpu;
+            torch-demo = callCognix ./examples/torch-demo;
+            gte-small = callCognix ./examples/gte-small;
+            gte-large = callCognix ./examples/gte-large;
+          };
         };
-        callCognix = import ./default.nix {
-          inherit pkgs dream2nix;
-          projectRoot = ./.;
-        };
-      in {
-        legacyPackages = {
-          ebsynth-cpu = callCognix ./examples/ebsynth-cpu;
-          torch-demo = callCognix ./examples/torch-demo;
-          gte-small = callCognix ./examples/gte-small;
-          gte-large = callCognix ./examples/gte-large;
-        } // {
-          inherit (pkgs) pget;
-        };
-      });
+    };
 }
