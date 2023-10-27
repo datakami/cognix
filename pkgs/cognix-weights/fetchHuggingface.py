@@ -1,18 +1,16 @@
-import json
 import sys
-from dataclasses import dataclass, field, asdict
-from typing import Optional
 import subprocess
 from shutil import rmtree, copyfileobj
 from pathlib import Path
 from urllib.request import urlretrieve, urlopen
 from tempfile import TemporaryDirectory
 import ssl
-import os
 
 import tempfile
 import pygit2 as git
 from google.cloud import storage
+
+from shared import Spec, Download, Lock, readLocks, readSpecs, toJSON, readLock, readSpec
 
 # todo: why is this neccesary :|
 cafile = ssl.get_default_verify_paths().cafile
@@ -20,26 +18,6 @@ context = ssl.create_default_context(cafile=cafile)
 def def_https(*args, **kwargs):
     return ssl.create_default_context(*args, cafile=cafile, **kwargs)
 ssl._create_default_https_context = def_https
-
-@dataclass
-class Spec:
-    src: str
-    rev: Optional[str] = None
-    ref: Optional[str] = None
-    build_include: list[str] = field(default_factory=list)
-    download_include: list[str] = field(default_factory=list)
-
-@dataclass
-class Download:
-    url: str
-    dest: str
-    hash: str
-
-@dataclass
-class Lock:
-    rev: str
-    hash: str
-    download_files: list[Download]
 
 def get_lfs_file(repo, commit, path):
     return f"https://huggingface.co/{repo}/resolve/{commit}/{path}"
@@ -153,68 +131,24 @@ def push(spec: Spec, lock: Lock):
                 content_type="application/octet-stream"
             )
 
-def pget(url: str, dest: Path):
-    subprocess.run(["pget", url, "-o", str(dest)], check=True)
-
-def run(root: Path, spec: Spec, lock: Lock):
-    for download in lock.download_files:
-        dest = root / spec.src / download.dest
-        if dest.exists():
-            print("Already downloaded", dest, file=sys.stderr)
-            continue
-        tmp_file = dest.with_suffix(dest.suffix + ".tmp")
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        # download to temp file, remove first
-        tmp_file.unlink(missing_ok=True)
-        # todo: timeout
-        pget(download.url, tmp_file)
-        tmp_file.rename(dest)
-
-def readJSON(ps: str):
-    p = Path(ps)
-    with p.open() as f:
-        return json.load(f)
-
-def toJSON(o):
-    return json.dumps(asdict(o), indent=2)
-
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("usage: fetchHuggingface.py <command> <args>")
         exit(1)
     match sys.argv[1]:
         case "lock":
-            j = readJSON(sys.argv[2])
-            if type(j) is list:
-                print(json.dumps([asdict(lock(Spec(**spec))) for spec in j], indent=2))
-            else:
-                print(toJSON(lock(Spec(**j))))
+            specs = readSpecs(sys.argv[2])
+            print(toJSON([lock(spec) for spec in specs], indent=2))
         case "build":
-            build(Path(sys.argv[2]), Spec(**readJSON(sys.argv[3])), Lock(**readJSON(sys.argv[4])))
+            root = Path(sys.argv[2])
+            spec, lock = readSpec(sys.argv[3]), readLock(sys.argv[4])
+            build(root, spec, lock)
         case "push":
-            specs = readJSON(sys.argv[2])
-            locks = readJSON(sys.argv[3])
-            if type(specs) is not list:
-                specs = [specs]
-                locks = [locks]
+            specs = readSpecs(sys.argv[2])
+            locks = readLocks(sys.argv[3])
             for spec, lock in zip(specs, locks):
-                spec = Spec(**spec)
-                lock = Lock(**lock)
                 lock.download_files = [Download(**d) for d in lock.download_files]
                 push(spec, lock)
-        case "run":
-            root = Path(sys.argv[2])
-            specs = readJSON(sys.argv[3])
-            locks = readJSON(sys.argv[4])
-            if type(specs) is not list:
-                specs = [specs]
-                locks = [locks]
-            for spec, lock in zip(specs, locks):
-                spec = Spec(**spec)
-                lock = Lock(**lock)
-                lock.download_files = [Download(**d) for d in lock.download_files]
-                run(root, spec, lock)
         case _:
             print("unknown command")
             exit(1)
-            

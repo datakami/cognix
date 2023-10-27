@@ -19,11 +19,12 @@
             overlays = [
               (final: prev: {
                 pget = prev.callPackage ./pkgs/pget.nix { };
+                cognix-weights = prev.callPackage ./pkgs/cognix-weights {};
               })
             ];
           };
           legacyPackages = {
-            inherit (pkgs) pget;
+            inherit (pkgs) pget cognix-weights;
             callCognix = import ./default.nix {
               inherit pkgs dream2nix;
               paths.projectRoot = ./.;

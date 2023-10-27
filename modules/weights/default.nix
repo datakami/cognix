@@ -16,17 +16,7 @@ let
   #   - push download_include files to weights bucket
   # - runtime: (not implemented)
   #   - pget download_included files, maybe check hashes
-
-  # ./fetchHuggingface.py does the heavy lifting
-  # package it and add the right deps (pygit2 and nix hash)
-  fetchHuggingface = let
-    interpreter = "${pkgs.python3.withPackages (ps: [ ps.pygit2 ps.google-cloud-storage ])}/bin/python";
-  in pkgs.runCommand "fetcher" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
-    mkdir -p $out/bin
-    makeWrapper ${interpreter} $out/bin/fetchHuggingface \
-      --add-flags ${./fetchHuggingface.py} \
-      --prefix PATH : ${lib.makeBinPath [ pkgs.nix ]}
-  '';
+  # pkgs/cognix-weights/*.py does the heavy lifting
 
   toJSONFile = name: contents: builtins.toFile name (builtins.toJSON contents);
 
@@ -60,7 +50,7 @@ let
 in {
   imports = [ ./interface.nix ];
   config = lib.mkIf (weights != [ ]) {
-    deps = { inherit fetchHuggingface; };
+    deps.fetchHuggingface = pkgs.cognix-weights;
     # https://nix-community.github.io/dream2nix/options/lock.html
     lock = {
       invalidationData = { inherit weights; };
