@@ -12,7 +12,7 @@ let
   #   - same process but with rev pinned
   #   - nix checks and content-addresses by the hash
   #   - symlinked to img /src/${name} so huggingface loads work
-  # - push: (not implemented)
+  # - push:
   #   - push download_include files to weights bucket
   # - runtime: (not implemented)
   #   - pget download_included files, maybe check hashes
@@ -72,7 +72,7 @@ in {
         '';
       };
     };
-    public.push-weights = pkgs.writeScript "push-huggingface" ''
+    public.push-weights = pkgs.writeScriptBin "push-huggingface" ''
       #!/bin/sh
       ${config.deps.fetchHuggingface}/bin/fetchHuggingface push \
         ${toJSONFile "specs.json" weights} ${toJSONFile "lock.json" config.lock.content.weights}
