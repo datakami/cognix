@@ -47,10 +47,17 @@ let
       ln -s ${weight} $out/src/${weight.spec.src}
     '') weightsDrvs);
 
+  downloadWeights = pkgs.writeScriptBin "download-weights" ''
+    #!/bin/sh
+    ${config.deps.downloadWeights.run}/bin/downloadWeights /src \
+      ${toJSONFile "specs.json" weights} ${toJSONFile "lock.json" config.lock.content.weights}
+  '';
+
 in {
   imports = [ ./interface.nix ];
   config = lib.mkIf (weights != [ ]) {
     deps.fetchHuggingface = pkgs.cognix-weights;
+    deps.downloadWeights = pkgs.cognix-weights.override { python3 = config.python-env.deps.python; };
     # https://nix-community.github.io/dream2nix/options/lock.html
     lock = {
       invalidationData = { inherit weights; };
@@ -70,7 +77,7 @@ in {
     dockerTools.streamLayeredImage = {
       # debug: nix build .#thing.weights
       passthru.weights = weightsEnv;
-      contents = [ weightsEnv ];
+      contents = [ weightsEnv downloadWeights pkgs.cacert ];
     };
   };
 }

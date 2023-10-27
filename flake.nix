@@ -23,6 +23,10 @@
               })
             ];
           };
+          devShells.python = with pkgs; mkShell {
+            nativeBuildInputs = [ pyright ruff python3 ];
+            propagatedBuildInputs = with python3.pkgs; [ pygit2 google-cloud-storage ];
+          };
           legacyPackages = {
             inherit (pkgs) pget cognix-weights;
             callCognix = import ./default.nix {

@@ -71,6 +71,7 @@ in {
         ] ++ resolvedSystemPackages;
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
+        Env = [ "PYTHONUNBUFFERED=1" ];
         EXPOSE = 5000;
         CMD = [ "python" "-m" "cog.server.http" ];
         WorkingDir = "/src";

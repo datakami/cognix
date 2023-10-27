@@ -10,7 +10,7 @@ import tempfile
 import pygit2 as git
 from google.cloud import storage
 
-from shared import Spec, Download, Lock, readLocks, readSpecs, toJSON, readLock, readSpec
+from shared import Spec, Download, Lock, readLocks, readSpecs, toJSON, readLock, readSpec, parseLFS
 
 # todo: why is this neccesary :|
 cafile = ssl.get_default_verify_paths().cafile
@@ -22,18 +22,6 @@ ssl._create_default_https_context = def_https
 def get_lfs_file(repo, commit, path):
     return f"https://huggingface.co/{repo}/resolve/{commit}/{path}"
 
-def parseLFS(p: Path):
-    ret = {}
-    if p.stat().st_size >= 1024:
-        return None
-    with p.open() as f:
-        for line in f:
-            [k, v] = line.strip().split(" ", 1)
-            ret[k] = v
-    if not ("version" in ret and "oid" in ret and "size" in ret):
-        return None
-    return ret
-    
 def allglob(root: Path, patterns: list[str]) -> set[Path]:
     found = set()
     for pattern in patterns:
@@ -138,17 +126,17 @@ if __name__ == '__main__':
     match sys.argv[1]:
         case "lock":
             specs = readSpecs(sys.argv[2])
-            print(toJSON([lock(spec) for spec in specs], indent=2))
+            print(toJSON([lock(spec) for spec in specs]))
         case "build":
             root = Path(sys.argv[2])
-            spec, lock = readSpec(sys.argv[3]), readLock(sys.argv[4])
-            build(root, spec, lock)
+            specData = readSpec(sys.argv[3])
+            lockData = readLock(sys.argv[4])
+            build(root, specData, lockData)
         case "push":
             specs = readSpecs(sys.argv[2])
             locks = readLocks(sys.argv[3])
-            for spec, lock in zip(specs, locks):
-                lock.download_files = [Download(**d) for d in lock.download_files]
-                push(spec, lock)
+            for specData, lockData in zip(specs, locks):
+                push(specData, lockData)
         case _:
             print("unknown command")
             exit(1)

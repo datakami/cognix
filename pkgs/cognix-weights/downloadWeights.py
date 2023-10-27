@@ -1,15 +1,18 @@
 import sys
 import subprocess
 from pathlib import Path
-from shared import Spec, Lock, readSpecs, readLocks
+from shared import Spec, Lock, readSpecs, readLocks, parseLFS
 
 def pget(url: str, dest: Path):
     subprocess.run(["pget", url, "-o", str(dest)], check=True)
 
+BASE = "https://weights.replicate.delivery/default"
+
 def run(root: Path, spec: Spec, lock: Lock):
     for download in lock.download_files:
         dest = root / spec.src / download.dest
-        if dest.exists():
+
+        if dest.exists() and parseLFS(dest) is None:
             print("Already downloaded", dest, file=sys.stderr)
             continue
         tmp_file = dest.with_suffix(dest.suffix + ".tmp")
@@ -17,7 +20,8 @@ def run(root: Path, spec: Spec, lock: Lock):
         # download to temp file, remove first
         tmp_file.unlink(missing_ok=True)
         # todo: timeout
-        pget(download.url, tmp_file)
+        url = f'{BASE}/{spec.src.replace("/", "--")}/{lock.rev}/{download.dest}'
+        pget(url, tmp_file)
         tmp_file.rename(dest)
 
 if __name__ == '__main__':
