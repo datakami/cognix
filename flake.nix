@@ -20,6 +20,7 @@
               (final: prev: {
                 pget = prev.callPackage ./pkgs/pget.nix { };
                 cognix-weights = prev.callPackage ./pkgs/cognix-weights {};
+                cognix-cli = prev.callPackage ./pkgs/cognix-cli {};
                 cog = prev.callPackage ./pkgs/cog.nix {};
               })
             ];
@@ -32,8 +33,12 @@
             nativeBuildInputs = [ pyright ruff python3 ];
             propagatedBuildInputs = with python3.pkgs; [ click ];
           };
+          devShells.default = with pkgs; mkShell {
+            nativeBuildInputs = [ cognix-cli ];
+          };
+          packages.default = pkgs.cognix-cli;
           legacyPackages = {
-            inherit (pkgs) pget cognix-weights cog;
+            inherit (pkgs) pget cognix-weights cognix-cli cog;
             callCognix = import ./default.nix {
               inherit pkgs dream2nix;
               paths.projectRoot = ./.;
