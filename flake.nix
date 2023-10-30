@@ -20,15 +20,20 @@
               (final: prev: {
                 pget = prev.callPackage ./pkgs/pget.nix { };
                 cognix-weights = prev.callPackage ./pkgs/cognix-weights {};
+                cog = prev.callPackage ./pkgs/cog.nix {};
               })
             ];
           };
-          devShells.python = with pkgs; mkShell {
+          devShells.weights = with pkgs; mkShell {
             nativeBuildInputs = [ pyright ruff python3 ];
             propagatedBuildInputs = with python3.pkgs; [ pygit2 google-cloud-storage ];
           };
+          devShells.cli = with pkgs; mkShell {
+            nativeBuildInputs = [ pyright ruff python3 ];
+            propagatedBuildInputs = with python3.pkgs; [ click ];
+          };
           legacyPackages = {
-            inherit (pkgs) pget cognix-weights;
+            inherit (pkgs) pget cognix-weights cog;
             callCognix = import ./default.nix {
               inherit pkgs dream2nix;
               paths.projectRoot = ./.;

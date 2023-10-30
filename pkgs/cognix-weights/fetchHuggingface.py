@@ -100,7 +100,7 @@ def build(root: Path, spec: Spec, lock: Lock):
         urlretrieve(download.url, str(root / download.dest))
 
 def push(spec: Spec, lock: Lock):
-    storage_client = storage.Client()
+    storage_client = storage.Client(project="replicate-production")
     bucket = storage_client.bucket("replicate-weights")
     for download in lock.download_files:
         filename = f'{spec.src.replace("/", "--")}/{lock.rev}/{download.dest}'
