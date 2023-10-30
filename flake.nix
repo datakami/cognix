@@ -38,6 +38,8 @@
             torch-demo = callCognix ./examples/torch-demo;
             gte-small = callCognix ./examples/gte-small;
             gte-large = callCognix ./examples/gte-large;
+            jina-embeddings-v2-small-en = callCognix ./examples/jina-embeddings-v2-small-en;
+            jina-embeddings-v2-base-en = callCognix ./examples/jina-embeddings-v2-base-en;
           };
         };
     };

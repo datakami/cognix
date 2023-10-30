@@ -43,13 +43,12 @@ def readJSON(ps: str):
         return json.load(f)
 
 def readLock(ps: str) -> Lock:
-    lock = readJSON(ps)
+    lock = Lock(**readJSON(ps))
     lock.download_files = [Download(**d) for d in lock.download_files]
-    return Lock(**lock)
+    return lock
 
 def readSpec(ps: str) -> Spec:
-    spec = readJSON(ps)
-    return Spec(**spec)
+    return Spec(**readJSON(ps))
 
 def readLocks(ps: str) -> List[Lock]:
     locks = readJSON(ps)

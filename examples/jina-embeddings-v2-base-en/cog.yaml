@@ -1,0 +1,13 @@
+build:
+  gpu: true
+  python_version: "3.11"
+  python_packages:
+    - "torch==2.0.1"
+    - "transformers"
+
+predict: "predict.py:Predictor"
+
+weights:
+  - src: jinaai/jina-embeddings-v2-base-en
+    build_include: ["model.safetensors"]
+  - src: jinaai/jina-bert-implementation
