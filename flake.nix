@@ -10,6 +10,10 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
       # debug = true;
+      flake.templates.default = {
+        path = ./template;
+        description = "A single cognix project";
+      };
       perSystem = { system, pkgs, config, ... }:
         let inherit (config.legacyPackages) callCognix;
         in {

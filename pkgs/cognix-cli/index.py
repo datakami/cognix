@@ -11,7 +11,10 @@ from pathlib import Path
 def cli(ctx, pkg):
     ctx.ensure_object(dict)
     if pkg is None:
-        pkg = Path(".").resolve().name
+        if Path("flake.nix").exists():
+            pkg = "default"
+        else:
+            pkg = Path(".").resolve().name
     ctx.obj["PKG"] = pkg
    
 # - cognix init
