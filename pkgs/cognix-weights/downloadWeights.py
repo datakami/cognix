@@ -4,7 +4,7 @@ from pathlib import Path
 from shared import Spec, Lock, readSpecs, readLocks, parseLFS
 
 def pget(url: str, dest: Path):
-    subprocess.run(["pget", url, "-o", str(dest)], check=True)
+    subprocess.run(["pget", url, str(dest)], check=True, close_fds=False)
 
 BASE = "https://weights.replicate.delivery/default"
 
