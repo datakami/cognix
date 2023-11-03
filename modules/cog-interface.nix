@@ -35,6 +35,10 @@ in
         default = [];
         apply = lib.unique;
       };
+      cog_version = mkOption {
+        type = types.str;
+        default = "0.8.6";
+      };
     };
     predict = mkOption {
       type = types.str;

@@ -41,6 +41,7 @@ def get_tag(cmd: str) -> str:
 @cli.command()
 @click.pass_context
 def load(cli):
+    cli.invoke(build)
     f = subprocess.run(["nix", "build", ".#" + cli.obj["PKG"], "--json", "--no-link"], check=True, capture_output=True)
     result = json.loads(f.stdout)
     cmd = result[0]["outputs"]["out"]

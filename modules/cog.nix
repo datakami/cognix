@@ -114,7 +114,7 @@ in {
       }.${cfg.python_version};
       pip = {
         pypiSnapshotDate = cfg.python_snapshot_date;
-        requirementsList = [ "cog==0.8.6" ] ++ cfg.python_packages
+        requirementsList = [ "cog==${cfg.cog_version}" ] ++ cfg.python_packages
           ++ (lib.concatMap (x: [ "--extra-index-url" x ])
             cfg.python_extra_index_urls);
         #requirementsList = [ "${./inputs}/cog-0.0.1.dev-py3-none-any.whl" ];
