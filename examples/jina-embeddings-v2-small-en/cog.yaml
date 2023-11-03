@@ -4,6 +4,7 @@ build:
   python_packages:
     - "torch==2.0.1"
     - "transformers"
+  cog_version: "0.9.0b9"
 
 predict: "predict.py:Predictor"
 
