@@ -14,8 +14,11 @@
         path = ./template;
         description = "A single cognix project";
       };
-      flake.lib.singleCognixFlake = { self, cognix, ... }: {
-        packages.x86_64-linux.default = cognix.legacyPackages.x86_64-linux.callCognix { paths.projectRoot = self; } "${self}";
+      flake.lib.singleCognixFlake = { self, cognix, ... }: name: {
+        packages.x86_64-linux.default = cognix.legacyPackages.x86_64-linux.callCognix {
+          paths.projectRoot = self;
+          inherit name;
+        } "${self}";
         devShells.x86_64-linux.default = cognix.devShells.x86_64-linux.default;
         apps.x86_64-linux.default = {
           type = "app";
