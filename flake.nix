@@ -14,8 +14,19 @@
         path = ./template;
         description = "A single cognix project";
       };
+      flake.lib.singleCognixFlake = { self, cognix, ... }: {
+        packages.x86_64-linux.default = cognix.legacyPackages.x86_64-linux.callCognix { paths.projectRoot = self; } "${self}";
+        devShells.x86_64-linux.default = cognix.devShells.x86_64-linux.default;
+        apps.x86_64-linux.default = {
+          type = "app";
+          program = "${cognix.packages.x86_64-linux.default}/bin/cognix";
+        };
+      };
       perSystem = { system, pkgs, config, ... }:
-        let inherit (config.legacyPackages) callCognix;
+        let
+          callCognix = config.legacyPackages.callCognix {
+            paths.projectRoot = ./.;
+          };
         in {
           _module.args.pkgs = import nixpkgs {
             config.allowUnfree = true;
@@ -45,7 +56,6 @@
             inherit (pkgs) pget cognix-weights cognix-cli cog;
             callCognix = import ./default.nix {
               inherit pkgs dream2nix;
-              paths.projectRoot = ./.;
             };
 
             ebsynth-cpu = callCognix ./examples/ebsynth-cpu;
