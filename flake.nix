@@ -14,17 +14,33 @@
         path = ./template;
         description = "A single cognix project";
       };
-      flake.lib.singleCognixFlake = { self, cognix, ... }: name: {
-        packages.x86_64-linux.default = cognix.legacyPackages.x86_64-linux.callCognix {
-          paths.projectRoot = self;
-          inherit name;
-        } "${self}";
-        devShells.x86_64-linux.default = cognix.devShells.x86_64-linux.default;
-        apps.x86_64-linux.default = {
-          type = "app";
-          program = "${cognix.packages.x86_64-linux.default}/bin/cognix";
+      flake.lib.singleCognixFlake = { self, cognix, ... }@inputs:
+        name:
+        cognix.lib.cognixFlake inputs { ${name} = "${self}"; };
+      flake.lib.cognixFlake = { self, cognix, ... }:
+        packages: {
+          packages.x86_64-linux = let
+            calledPackages = builtins.mapAttrs (name: path:
+              cognix.legacyPackages.x86_64-linux.callCognix {
+                paths.projectRoot = self;
+                inherit name;
+              } path) packages;
+          in if (builtins.length (builtins.attrNames calledPackages) == 1) then
+            calledPackages // {
+              # if there's just 1 package, alias to 'default'
+              default = calledPackages.${
+                  builtins.head (builtins.attrNames calledPackages)
+                };
+            }
+          else
+            calledPackages;
+          devShells.x86_64-linux.default =
+            cognix.devShells.x86_64-linux.default;
+          apps.x86_64-linux.default = {
+            type = "app";
+            program = "${cognix.packages.x86_64-linux.default}/bin/cognix";
+          };
         };
-      };
       perSystem = { system, pkgs, config, ... }:
         let
           callCognix = config.legacyPackages.callCognix {
