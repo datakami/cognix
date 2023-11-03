@@ -11,7 +11,7 @@ FORMATS = [
 ]
 FORMATS_MAP = dict(FORMATS)
 
-class Output(BaseModel):
+class Out(BaseModel):
     vectors: str | list[float]
     text: str
 
@@ -30,7 +30,7 @@ class Predictor(BasePredictor):
             default=FORMATS[0][0],
             choices=[k for (k, _v) in FORMATS],
         ),
-    ) -> list[Output]:
+    ) -> list[Out]:
         """Run a single prediction on the model"""
         map_func = FORMATS_MAP[output_format]
         if not isinstance(text, list):
@@ -39,5 +39,5 @@ class Predictor(BasePredictor):
         embeddings = self.model.encode(text)
         res = []
         for text_, vectors in zip(text, embeddings):
-            res.append(Output(vectors=map_func(vectors), text=text_))
+            res.append(Out(vectors=map_func(vectors), text=text_))
         return res
