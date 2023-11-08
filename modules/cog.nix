@@ -14,9 +14,14 @@ let
 
   # derivation containing all files in dir, basis of /src
   entirePackage = pkgs.runCommand "cog-source" {
-    src = if cognixcfg.sourceIgnores != "" then
-      pkgs.nix-gitignore.gitignoreSourcePure cognixcfg.sourceIgnores cognixcfg.rootPath
-          else pkgs.lib.cleanSource cognixcfg.rootPath;
+    src = builtins.path {
+      name = "cognix-src-in";
+      path = cognixcfg.rootPath;
+      filter =
+        if cognixcfg.sourceIgnores != ""
+        then pkgs.nix-gitignore.gitignoreFilterPure pkgs.lib.cleanSourceFilter cognixcfg.sourceIgnores cognixcfg.rootPath
+        else pkgs.lib.cleanSourceFilter;
+    };
     nativeBuildInputs = [ pkgs.yj pkgs.jq ];
   } ''
     mkdir $out
