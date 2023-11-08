@@ -61,6 +61,9 @@ in {
     type = types.path;
   };
   config = {
+    cognix.systemPackages = {
+      inherit (pkgs) pget;
+    };
     dockerTools.streamLayeredImage = {
       passthru.entirePackage = entirePackage;
       # glibc.out is needed for gpu
