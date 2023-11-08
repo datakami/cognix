@@ -1,5 +1,6 @@
 { config, lib, dream2nix, pkgs, ... }:
 let
+  cognixcfg = config.cognix;
   cfg = config.cog.build;
 
   # conditional overrides: only active when a lib is in use
@@ -13,7 +14,9 @@ let
 
   # derivation containing all files in dir, basis of /src
   entirePackage = pkgs.runCommand "cog-source" {
-    src = pkgs.lib.cleanSource "${config.paths.projectRoot}/${config.paths.package}";
+    src = if cognixcfg.sourceIgnores != "" then
+      pkgs.nix-gitignore.gitignoreSourcePure cognixcfg.sourceIgnores cognixcfg.rootPath
+          else pkgs.lib.cleanSource cognixcfg.rootPath;
     nativeBuildInputs = [ pkgs.yj pkgs.jq ];
   } ''
     mkdir $out
@@ -64,6 +67,15 @@ in {
     cognix.systemPackages = {
       inherit (pkgs) pget;
     };
+    # read dockerignore
+    cognix.sourceIgnores = lib.mkIf
+      (builtins.pathExists "${cognixcfg.rootPath}/.dockerignore")
+      (builtins.readFile "${cognixcfg.rootPath}/.dockerignore");
+
+    cognix.rootPath = if config.paths.package == "./." then
+      "${config.paths.projectRoot}"
+               else "${config.paths.projectRoot}/${config.paths.package}";
+
     dockerTools.streamLayeredImage = {
       passthru.entirePackage = entirePackage;
       # glibc.out is needed for gpu

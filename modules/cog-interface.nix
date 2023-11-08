@@ -50,9 +50,22 @@ in
       example = "train.py:train";
     };
   };
-  options.cognix.systemPackages = with lib; mkOption {
-    default = {};
-    type = types.attrsOf types.package;
+  options.cognix = with lib; {
+    systemPackages = mkOption {
+      default = {};
+      type = types.attrsOf types.package;
+    };
+    sourceIgnores = mkOption {
+      type = types.lines;
+      default = "";
+      example = ''
+        /models/*
+      '';
+    };
+    rootPath = mkOption {
+      type = types.str;
+      description = "Path containing cog.yaml, predict.py, .dockerignore";
+    };
   };
   options.python-env = with lib; mkOption {
     type = types.submoduleWith {
