@@ -71,6 +71,7 @@ in {
         [
           bashInteractive
           busybox
+          cacert
           config.python-env.public.pyEnv
           entirePackage
           fakePip

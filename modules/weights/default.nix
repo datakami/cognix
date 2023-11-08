@@ -77,7 +77,7 @@ in {
     dockerTools.streamLayeredImage = {
       # debug: nix build .#thing.weights
       passthru.weights = weightsEnv;
-      contents = [ weightsEnv downloadWeights pkgs.cacert ];
+      contents = [ weightsEnv downloadWeights ];
     };
   };
 }
