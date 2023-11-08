@@ -106,7 +106,10 @@ in {
       };
       # needed for gpu:
       # fixed in https://github.com/NixOS/nixpkgs/pull/260063
-      extraCommands = "mkdir tmp";
+      extraCommands = ''
+        mkdir tmp
+        ln -s ca-bundle.crt etc/ssl/certs/ca-certificates.crt
+      '';
     };
     lock = {
       inherit (config.python-env.public.config.lock) fields invalidationData;
