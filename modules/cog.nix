@@ -20,7 +20,9 @@ let
     cp -r $src $out/src
     chmod -R +w $out
     # we have to modify cog.yaml to make sure predict: is in there
-    yj < $src/cog.yaml | jq --arg PREDICT "${config.cog.predict}" '.predict = $PREDICT' > $out/src/cog.yaml
+    yj < $src/cog.yaml | jq --arg PREDICT "${config.cog.predict}" '.predict = $PREDICT' \
+      ${if config.cog.train != null then ''| jq --arg TRAIN "${config.cog.train}" '.train = $TRAIN' '' else ""} \
+      > $out/src/cog.yaml
   '';
   # add org.cogmodel and run.cog prefixes to attr set
   mapAttrNames = f: set:

@@ -44,6 +44,11 @@ in
       type = types.str;
       default = "predict.py:Predictor";
     };
+    train = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "train.py:train";
+    };
   };
   options.cognix.systemPackages = with lib; mkOption {
     default = {};
