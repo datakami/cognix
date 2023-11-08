@@ -66,6 +66,14 @@ in
       type = types.str;
       description = "Path containing cog.yaml, predict.py, .dockerignore";
     };
+    postCopyCommands = mkOption {
+      type = types.lines;
+      default = "";
+      example = ''
+        touch $out/src/.env
+      '';
+      description = "Commands to run after gathering all the files for the container /src dir";
+    };
   };
   options.python-env = with lib; mkOption {
     type = types.submoduleWith {

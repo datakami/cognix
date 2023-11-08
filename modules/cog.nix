@@ -26,6 +26,7 @@ let
     yj < $src/cog.yaml | jq --arg PREDICT "${config.cog.predict}" '.predict = $PREDICT' \
       ${if config.cog.train != null then ''| jq --arg TRAIN "${config.cog.train}" '.train = $TRAIN' '' else ""} \
       > $out/src/cog.yaml
+    ${cognixcfg.postCopyCommands}
   '';
   # add org.cogmodel and run.cog prefixes to attr set
   mapAttrNames = f: set:
