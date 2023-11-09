@@ -105,7 +105,7 @@ in {
         # todo: extract openapi schema in nix build (optional?)
         Labels = addLabelPrefix {
           has_init = "true";
-          config = builtins.toJSON { build.gpu = cfg.gpu; };
+          config = builtins.toJSON config.cog;
           openapi_schema = builtins.readFile config.openapi-spec;
           cog_version = "${cfg.cog_version}";
         };
