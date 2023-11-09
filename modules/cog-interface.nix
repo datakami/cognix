@@ -6,9 +6,6 @@ let
 in
 {
   options.cog = with lib; {
-    name = mkOption {
-      type = types.str;
-    };
     build = {
       gpu = mkEnableOption "GPU support";
       cuda = mkOption {
