@@ -46,6 +46,14 @@ let
     if lib.isDerivation pkg then pkg else
       config.cognix.systemPackages.${pkg}) cfg.system_packages;
 
+  generateJSON = args: files: pkgs.runCommand "generated-json.json" {
+    nativeBuildInputs = [ pkgs.jq ];
+  } ''
+    jq --null-input '${args}' \
+    ${lib.concatMapStringsSep " " (filename: "--rawfile ${filename} ${files.${filename}}") (builtins.attrNames files)} \
+    > $out
+  '';
+
   proxyLockModule = content: {
     # we put python env deps in config.python-env
     # but lock should be top-level
@@ -102,12 +110,15 @@ in {
         CMD = [ "python" "-m" "cog.server.http" ];
         WorkingDir = "/src";
         # todo: my cog doesn't like run.cog.config
-        # todo: extract openapi schema in nix build (optional?)
         Labels = addLabelPrefix {
           has_init = "true";
           config = builtins.toJSON config.cog;
-          openapi_schema = builtins.readFile config.openapi-spec;
           cog_version = "${cfg.cog_version}";
+          # Initially we had openapi_schema here, but there is a problem with doing that:
+          # builtins.readFile has to generate the file to read the contents,
+          # and so computing the hash would require building most of the dependencies.
+          # To avoid this, we insert openapi_schema in `extraJSONFile`, when all of the deps
+          # have been built anyways.
         };
       };
       # needed for gpu:
@@ -116,6 +127,14 @@ in {
         mkdir tmp
         ln -s ca-bundle.crt etc/ssl/certs/ca-certificates.crt
       '';
+      extraJSONFile = generateJSON ''
+        {
+          config: { Labels: {
+            "run.cog.openapi_schema": $openapi_schema,
+            "org.cogmodel.openapi_schema": $openapi_schema
+          } }
+        }
+      '' { openapi_schema = config.openapi-spec; };
     };
     lock = {
       inherit (config.python-env.public.config.lock) fields invalidationData;

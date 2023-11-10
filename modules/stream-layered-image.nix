@@ -1,5 +1,29 @@
 { config, lib, dream2nix, packageSets, ... }:
-let cfg = config.dockerTools.streamLayeredImage; in
+let cfg = config.dockerTools.streamLayeredImage;
+    pkgs = packageSets.nixpkgs;
+    # todo: upstream 'extraJSONFile' into nix docker-tools
+    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/docker/default.nix#L1015
+    streamScript = pkgs.writers.writePython3 "stream" {} (pkgs.path + "/pkgs/build-support/docker/stream_layered_image.py");
+    patchJson = img: extraJSON: pkgs.runCommand "patched-${img.imageName}-conf.json" {
+      preferLocalBuild = true;
+      nativeBuildInputs = [ pkgs.jq ];
+    } ''
+      outName="$(basename "$out")"
+      outHash=$(echo "$outName" | cut -d - -f 1)
+      json_path=$(grep -o '/nix/store/[^ ]*-conf.json' < ${img})
+      jq -s '.[0] * .[1] + {
+        "repo_tag": $repo_tag
+      }' --arg repo_tag "${img.imageName}:$outHash" \
+      "$json_path" "${extraJSON}" > $out
+    '';
+    patchLayeredImage = img: extraJSON: pkgs.runCommand "stream-${img.imageName}" {
+      passthru = img.passthru // { wrapped = img; };
+      preferLocalBuild = true;
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+    } ''
+      makeWrapper ${streamScript} $out --add-flags ${patchJson img extraJSON}
+    '';
+in
 {
   options.dockerTools.streamLayeredImage = with lib; {
     tag = mkOption {
@@ -79,13 +103,27 @@ let cfg = config.dockerTools.streamLayeredImage; in
       type = types.attrsOf types.anything;
       description = "Passthru arguments for the underlying derivation.";
     };
+    extraJSONFile = mkOption {
+      default = null;
+      type = types.nullOr types.path;
+      description = ''
+        JSON file that's merged into the stream configuration.
+        Use this to add things only available at build time, such as other build results.
+      '';
+    };
   };
 
-  config.public = (packageSets.nixpkgs.dockerTools.streamLayeredImage {
-    inherit (config) name;
-    inherit (cfg)
-      tag fromImage contents config architecture
-      created extraCommands fakeRootCommands enableFakechroot
-      maxLayers includeStorePaths passthru;
-  }) // { inherit (config) name; };
+  config.public = let
+    orig_stream = packageSets.nixpkgs.dockerTools.streamLayeredImage {
+      inherit (config) name;
+      inherit (cfg)
+        tag fromImage contents config architecture
+        created extraCommands fakeRootCommands enableFakechroot
+        maxLayers includeStorePaths passthru;
+    };
+  in
+    (if cfg.extraJSONFile != null then
+      patchLayeredImage orig_stream cfg.extraJSONFile
+    else
+      orig_stream) // { inherit (config) name; };
 }
