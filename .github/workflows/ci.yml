@@ -9,6 +9,6 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: cachix/install-nix-action@a56e3a80896f10bfe28feea2c49695c0225b2485
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix flake check --allow-import-from-derivation
