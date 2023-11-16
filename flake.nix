@@ -71,6 +71,11 @@
             nativeBuildInputs = [ cognix-cli ];
           };
           packages.default = pkgs.cognix-cli;
+          checks.default = pkgs.linkFarm "all-checks" (pkgs.lib.mapAttrsToList
+            (name: path: {
+              inherit name;
+              path = if pkgs.lib.isDerivation path then path else "/dev/null";
+            }) config.legacyPackages);
           legacyPackages = {
             inherit (pkgs) pget cognix-weights cognix-cli cog;
             callCognix = import ./default.nix {
