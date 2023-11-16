@@ -12,12 +12,10 @@ jobs:
       - uses: cachix/install-nix-action@a56e3a80896f10bfe28feea2c49695c0225b2485
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: |
-          echo "before rm"
-          df -h
+          echo "building"
+          # remove some useless paths, saves 10GB
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          echo "before build"
-          df -h
-          nix flake check --allow-import-from-derivation --keep-failed || df -h
+          nix flake check --allow-import-from-derivation
