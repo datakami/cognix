@@ -21,16 +21,19 @@ let
   knowsTorch = torches != [ ];
   torchVersion = builtins.substring 7 (-1) (builtins.head torches);
 in {
-  config = lib.mkIf knowsTorch {
-    cog.build.cuda = lib.mkDefault (if cfg.gpu then
-      (defaultTorchCudas.${torchVersion} or (throw
-        "Unknown torch version ${torchVersion}, specify build.cuda manually"))
-    else
-      null);
+  config = lib.mkMerge [
+    (lib.mkIf (knowsTorch) {
+      cog.build.cuda = lib.mkDefault (if cfg.gpu then
+        (defaultTorchCudas.${torchVersion} or (throw
+          "Unknown torch version ${torchVersion}, specify build.cuda manually"))
+      else
+        null);
 
-    cog.build.python_extra_index_urls = if cfg.gpu then
-      [ (toTorchIndex cfg.cuda) ]
-    else
-      [ "https://download.pytorch.org/whl/cpu" ];
-  };
+      cog.build.python_extra_index_urls = if cfg.gpu then
+        [ (toTorchIndex cfg.cuda) ]
+      else
+        [ "https://download.pytorch.org/whl/cpu" ];
+    })
+    (lib.mkIf (!cfg.gpu) { cog.build.cuda = lib.mkDefault null; })
+  ];
 }
