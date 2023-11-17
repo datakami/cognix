@@ -11,7 +11,7 @@
 // * "store_layers" is a list of layers in ascending order, where each
 //   layer is the list of store paths to include in that layer.
 
-package cli
+package main
 
 import (
 	"encoding/json"
@@ -30,10 +30,12 @@ import (
 
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/google/go-containerregistry/pkg/v1/daemon"
+	// "github.com/google/go-containerregistry/pkg/v1/daemon"
 	"github.com/google/go-containerregistry/pkg/v1/empty"
 	"github.com/google/go-containerregistry/pkg/v1/mutate"
-	"github.com/google/go-containerregistry/pkg/v1/stream"
+	//"github.com/google/go-containerregistry/pkg/v1/stream"
+	"github.com/google/go-containerregistry/pkg/v1/static"
+	"github.com/google/go-containerregistry/pkg/v1/tarball"
 	"github.com/google/go-containerregistry/pkg/v1/types"
 	"github.com/replicate/yolo/pkg/auth"
 
@@ -46,7 +48,10 @@ import (
 var (
 	writeLocal = false
 	debugMode  = os.Getenv("DEBUG") != ""
+				sToken string
+				sRegistry string
 )
+
 
 func debug(msg ...any) {
 	if debugMode {
@@ -275,7 +280,8 @@ func addLayerDir(paths []string, mtime int64, layerType types.MediaType) mutate.
 	// }
 
 	layerData := archivePaths(paths, int64(mtime))
-	layer := stream.NewLayer(io.NopCloser(layerData), stream.WithMediaType(layerType))
+  layer := static.NewLayer(layerData.Bytes(), layerType)
+	// layer := stream.NewLayer(io.NopCloser(layerData), stream.WithMediaType(layerType))
 	history := v1.History{
 		Created: v1.Time{Time: time.Unix(mtime, 0)},
 		Comment: fmt.Sprintf("store paths: %s", paths),
@@ -325,12 +331,10 @@ func addCustomizationLayer(customisation_layer string, mtime int64, layerType ty
 	// 	// }
 	// 	// path := fmt.Sprintf("%s/layer.tar", checksum)
 	path := fmt.Sprintf("%s/layer.tar", customisation_layer)
-	reader, err := os.Open(path)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "error opening", path, err)
-		return mutate.Addendum{}
-	}
-	layer := stream.NewLayer(io.NopCloser(reader), stream.WithMediaType(layerType))
+				layer, err := tarball.LayerFromFile(path, tarball.WithMediaType(layerType))
+				if err != nil {
+								panic(err)
+				}
 	history := v1.History{
 		Created: v1.Time{Time: time.Unix(int64(mtime), 0)},
 		Comment: fmt.Sprintf("store paths: %s", customisation_layer),
@@ -398,7 +402,7 @@ func checkValidPaths(conf Conf) error {
 	return nil
 }
 
-func main(args []string) error {
+func pushMain(args []string) error {
 	conf_bytes, _ := os.ReadFile(args[0])
 	var conf Conf
 	err := json.Unmarshal(conf_bytes, &conf)
@@ -488,7 +492,10 @@ func main(args []string) error {
 	// 		for layer in layers
 	// 	],
 	// }
-
+	configFile, err = image.ConfigFile()
+	if err != nil {
+					panic(err)
+	}
 	configFile.Config = overlayBaseConfig(configFile.Config, conf.Config)
 	configFile.Created = v1.Time{Time: created}
 	configFile.Architecture = conf.Architecture
@@ -506,22 +513,27 @@ func main(args []string) error {
 	// RepoTags are a property of the tarball image representation, not the image itself
 	// we could tag it, but that gets passed to crane.Push seately
 
-	if writeLocal {
-		fmt.Println("writing to local daemon, tag:", conf.RepoTag)
-		tag, err := name.NewTag(conf.RepoTag)
-		if err != nil {
-			return fmt.Errorf("parsing tag: %w", err)
-		}
-		_, err = daemon.Write(tag, image)
-		if err != nil {
-			return fmt.Errorf("writing to local daemon: %w", err)
-		}
-	} else {
-		_, err = pushImage(image, conf.RepoTag, auth)
-		if err != nil {
-			return fmt.Errorf("pushing image: %w", err)
-		}
+	// if writeLocal {
+	// 	fmt.Println("writing to local daemon, tag:", conf.RepoTag)
+	// 	tag, err := name.NewTag(conf.RepoTag)
+	// 	if err != nil {
+	// 		return fmt.Errorf("parsing tag: %w", err)
+	// 	}
+	// 	_, err = daemon.Write(tag, image)
+	// 	if err != nil {
+	// 		return fmt.Errorf("writing to local daemon: %w", err)
+	// 	}
+	// } else {
+	// 	_, err = pushImage(image, conf.RepoTag, auth)
+	// 	if err != nil {
+	// 		return fmt.Errorf("pushing image: %w", err)
+	// 	}
+	// }
+	newTag, err := name.NewTag(conf.RepoTag)
+	if err != nil {
+		panic(err)
 	}
+  tarball.Write(newTag, image, os.Stdout)
 	return nil
 }
 
@@ -561,7 +573,7 @@ func getAuth() authn.Authenticator {
 }
 
 func pushLayeredImageCommmand(cmd *cobra.Command, args []string) error {
-	return main(args)
+	return pushMain(args)
 }
 
 func newPushLayeredImageCommand() *cobra.Command {
