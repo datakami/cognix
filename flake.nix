@@ -61,6 +61,7 @@
                     revisionWithDefault = default: nixpkgs.rev or default;
                   };
                 });
+                stream_layered_image = prev.callPackage ./pkgs/yolo/default.nix {};
               })
             ];
           };
@@ -82,7 +83,7 @@
               path = if pkgs.lib.isDerivation path then path else "/dev/null";
             }) config.legacyPackages);
           legacyPackages = {
-            inherit (pkgs) pget cognix-weights cognix-cli cog;
+            inherit (pkgs) pget cognix-weights cognix-cli cog stream_layered_image;
             callCognix = import ./default.nix {
               inherit pkgs dream2nix;
             };

@@ -40,6 +40,7 @@ import (
 
 var (
 	writeLocal   = false
+	pushRemote   = false
 	writeArchive = false
 	debugMode    = os.Getenv("DEBUG") != ""
 	sToken       string
@@ -324,13 +325,17 @@ func pushMain(args []string) error {
 	// RepoTags are a property of the tarball image representation, not the image itself
 	// we could tag it, but that gets passed to crane.Push seately
 
+	if !writeArchive && !writeLocal && !pushRemote {
+		writeArchive = true
+	}
 	if writeArchive {
 		newTag, err := name.NewTag(conf.RepoTag)
 		if err != nil {
 			panic(err)
 		}
 		tarball.Write(newTag, image, os.Stdout)
-	} else if writeLocal {
+	}
+	if writeLocal {
 		fmt.Println("writing to local daemon, tag:", conf.RepoTag)
 		tag, err := name.NewTag(conf.RepoTag)
 		if err != nil {
@@ -340,7 +345,8 @@ func pushMain(args []string) error {
 		if err != nil {
 			return fmt.Errorf("writing to local daemon: %w", err)
 		}
-	} else {
+	}
+	if pushRemote {
 		auth := getAuth()
 		_, err = pushImage(image, conf.RepoTag, auth)
 		if err != nil {
@@ -397,7 +403,8 @@ func newPushLayeredImageCommand() *cobra.Command {
 		RunE:   pushLayeredImageCommmand,
 		Args:   cobra.ExactArgs(1),
 	}
-	cmd.Flags().BoolVarP(&writeLocal, "local", "l", false, "write to local daemon instead of pushing")
+	cmd.Flags().BoolVarP(&writeLocal, "local", "l", false, "write to local daemon")
+	cmd.Flags().BoolVarP(&pushRemote, "push", "p", false, "push to a remote repository")
 	cmd.Flags().BoolVarP(&writeArchive, "archive", "a", false, "write tar file to stdout")
 	cmd.Flags().StringVarP(&sToken, "token", "t", "", "replicate api token")
 	return cmd
