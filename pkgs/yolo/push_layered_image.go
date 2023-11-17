@@ -30,7 +30,7 @@ import (
 
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
-	// "github.com/google/go-containerregistry/pkg/v1/daemon"
+	"github.com/google/go-containerregistry/pkg/v1/daemon"
 	"github.com/google/go-containerregistry/pkg/v1/empty"
 	"github.com/google/go-containerregistry/pkg/v1/mutate"
 	//"github.com/google/go-containerregistry/pkg/v1/stream"
@@ -47,9 +47,10 @@ import (
 
 var (
 	writeLocal = false
+	writeArchive = false
 	debugMode  = os.Getenv("DEBUG") != ""
-				sToken string
-				sRegistry string
+	sToken string
+	sRegistry string
 )
 
 
@@ -402,7 +403,6 @@ func pushMain(args []string) error {
 	}
 	mtime := int64(created.Unix())
 
-	//auth := getAuth()
 	configFile := &v1.ConfigFile{}
 	if conf.FromImage != "" {
 		return fmt.Errorf("we don't support base images yet")
@@ -484,27 +484,29 @@ func pushMain(args []string) error {
 	// RepoTags are a property of the tarball image representation, not the image itself
 	// we could tag it, but that gets passed to crane.Push seately
 
-	// if writeLocal {
-	// 	fmt.Println("writing to local daemon, tag:", conf.RepoTag)
-	// 	tag, err := name.NewTag(conf.RepoTag)
-	// 	if err != nil {
-	// 		return fmt.Errorf("parsing tag: %w", err)
-	// 	}
-	// 	_, err = daemon.Write(tag, image)
-	// 	if err != nil {
-	// 		return fmt.Errorf("writing to local daemon: %w", err)
-	// 	}
-	// } else {
-	// 	_, err = pushImage(image, conf.RepoTag, auth)
-	// 	if err != nil {
-	// 		return fmt.Errorf("pushing image: %w", err)
-	// 	}
-	// }
-	newTag, err := name.NewTag(conf.RepoTag)
-	if err != nil {
-		panic(err)
+	if writeArchive {
+		newTag, err := name.NewTag(conf.RepoTag)
+		if err != nil {
+			panic(err)
+		}
+		tarball.Write(newTag, image, os.Stdout)
+	} else if writeLocal {
+		fmt.Println("writing to local daemon, tag:", conf.RepoTag)
+		tag, err := name.NewTag(conf.RepoTag)
+		if err != nil {
+			return fmt.Errorf("parsing tag: %w", err)
+		}
+		_, err = daemon.Write(tag, image)
+		if err != nil {
+			return fmt.Errorf("writing to local daemon: %w", err)
+		}
+	} else {
+		auth := getAuth()
+		_, err = pushImage(image, conf.RepoTag, auth)
+		if err != nil {
+			return fmt.Errorf("pushing image: %w", err)
+		}
 	}
-  tarball.Write(newTag, image, os.Stdout)
 	return nil
 }
 
@@ -556,6 +558,7 @@ func newPushLayeredImageCommand() *cobra.Command {
 		Args:   cobra.ExactArgs(1),
 	}
 	cmd.Flags().BoolVarP(&writeLocal, "local", "l", false, "write to local daemon instead of pushing")
+	cmd.Flags().BoolVarP(&writeArchive, "archive", "a", false, "write tar file to stdout")
 	cmd.Flags().StringVarP(&sToken, "token", "t", "", "replicate api token")
 	return cmd
 }
