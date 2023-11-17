@@ -59,35 +59,6 @@ func debug(msg ...any) {
 	}
 }
 
-// def load_from_image(from_image_str):
-//     """
-//     Loads the given base image, if any.
-//     from_image_str: Path to the base image archive.
-//     Returns: A 'FromImage' object with references to the loaded base image,
-//              or 'None' if no base image was provided.
-//     """
-//     if from_image_str is None:
-//         return None
-//     base_tar = tarfile.open(from_image_str)
-//     manifest_json_tarinfo = base_tar.getmember("manifest.json")
-//     with base_tar.extractfile(manifest_json_tarinfo) as f:
-//         manifest_json = json.load(f)
-//     image_json_tarinfo = base_tar.getmember(manifest_json[0]["Config"])
-//     with base_tar.extractfile(image_json_tarinfo) as f:
-//         image_json = json.load(f)
-//     return FromImage(base_tar, manifest_json, image_json)
-
-func fetchFromImage(baseRef string, auth authn.Authenticator) (v1.Image, error) {
-	fmt.Fprintln(os.Stderr, "fetching metadata for", baseRef)
-	start := time.Now()
-	base, err := crane.Pull(baseRef, crane.WithAuth(auth))
-	if err != nil {
-		return nil, fmt.Errorf("pulling %w", err)
-	}
-	fmt.Fprintln(os.Stderr, "pulling took", time.Since(start))
-	return base, nil
-}
-
 // def archive_paths_to(obj, paths, mtime):
 //     """
 //     Writes the given store paths as a tar file to the given stream.
@@ -151,7 +122,7 @@ func _applyFilters(mtime int64, ti *tar.Header) *tar.Header {
 	ti.Uid = 0
 	ti.Gid = 0
 	ti.Uname = "root"
-	ti.Gname = "root"
+  ti.Gname = "root"
 	return ti
 }
 func nixRoot(ti *tar.Header) *tar.Header {
@@ -169,9 +140,7 @@ func getFilesForPath(path string) []string {
 		return []string{path}
 	}
 	_ = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
 			files = append(files, path)
-		}
 		return nil
 	})
 	return files
@@ -184,8 +153,8 @@ func archivePaths(paths []string, mtime int64) *bytes.Buffer {
 	tw := tar.NewWriter(buf)
 	applyFilters := func(ti *tar.Header) *tar.Header { return _applyFilters(mtime, ti) }
 
-	tw.WriteHeader(applyFilters(nixRoot(dir("/nix"))))
-	tw.WriteHeader(applyFilters(nixRoot(dir("/nix/store"))))
+	tw.WriteHeader(applyFilters(nixRoot(dir("/nix/"))))
+	tw.WriteHeader(applyFilters(nixRoot(dir("/nix/store/"))))
 	for _, path := range paths {
 		files := getFilesForPath(path)
 		// stable order
@@ -193,8 +162,20 @@ func archivePaths(paths []string, mtime int64) *bytes.Buffer {
 
 		for _, filename := range files {
 			st, _ := os.Lstat(filename)
-			ti, _ := tar.FileInfoHeader(st, "")
-			ti.Name = filename
+			link := ""
+			if st.Mode() & os.ModeSymlink != 0 {
+				link_, err := os.Readlink(filename)
+				if err != nil {
+					panic(err)
+				}
+				link = link_
+			}
+			ti, _ := tar.FileInfoHeader(st, link)
+		  if st.IsDir() {
+				ti.Name = filename + "/"
+			} else {
+				ti.Name = filename
+			}
 			ti = appendRoot(ti)
 
 			// "copy hardlinks as regular files"
@@ -206,6 +187,8 @@ func archivePaths(paths []string, mtime int64) *bytes.Buffer {
 				ti.Size = deref_st.Size()
 			}
 			ti = applyFilters(ti)
+			// TODO: Go writes devmajor and devminor as '0000000', python and gnu tar write them
+			// as \x00. This means the checksums are different.
 			if ti.Typeflag == tar.TypeReg {
 				f, _ := os.Open(filename)
 				// this really needs to be done in parallel
@@ -219,6 +202,7 @@ func archivePaths(paths []string, mtime int64) *bytes.Buffer {
 			}
 		}
 	}
+	tw.Close()
 
 	return buf
 }
@@ -418,32 +402,20 @@ func pushMain(args []string) error {
 	}
 	mtime := int64(created.Unix())
 
-	auth := getAuth()
-	// from_image = load_from_image(conf["from_image"])
-	from_image := empty.Image
+	//auth := getAuth()
 	configFile := &v1.ConfigFile{}
 	if conf.FromImage != "" {
-		from_image, _ = fetchFromImage(conf.FromImage, auth)
-		configFile, err = from_image.ConfigFile()
-		if err != nil || configFile == nil {
-			return fmt.Errorf("getting base image config file: %w", err)
-		}
+		return fmt.Errorf("we don't support base images yet")
 	}
 
-	baseMediaType, _ := from_image.MediaType()
-	// if err != nil {
-	// 	return nil, fmt.Errorf("getting base image media type: %w", err)
-	// }
+	baseMediaType := types.DockerManifestSchema1
+	//baseMediaType := types.DockerManifestSchema2 // default!
 	layerType := types.DockerLayer
 	if baseMediaType == types.OCIManifestSchema1 {
-		layerType = types.OCILayer
+		layerType = types.OCIUncompressedLayer
 	}
 
 	start := 1
-	if from_image != nil {
-		m, _ := from_image.Manifest()
-		start = len(m.Layers) + 1
-	}
 	layers := make([]mutate.Addendum, len(conf.StoreLayers)+1)
 	var wg sync.WaitGroup
 	wg.Add(len(conf.StoreLayers) + 1)
@@ -451,7 +423,7 @@ func pushMain(args []string) error {
 		fmt.Fprintln(os.Stderr, "Creating layer", start+index, "from paths:", store_layer)
 		/* go */ func(index int, store_layer []string) {
 			defer wg.Done()
-			layers[index] = addLayerDir(store_layer, mtime, baseMediaType)
+			layers[index] = addLayerDir(store_layer, mtime, layerType)
 		}(index, store_layer)
 	}
 	fmt.Fprintln(os.Stderr, "Creating layer", len(layers), "with customisation...")
@@ -467,9 +439,8 @@ func pushMain(args []string) error {
 	}
 	// print out raw values of layers
 	debug("layers:", layers)
-	debug("from_image", from_image)
 	debug("running mutate.Append(from_image, layers...)")
-	image, err := mutate.Append(from_image, layers...)
+	image, err := mutate.Append(empty.Image, layers...)
 	if err != nil || image == nil {
 		return fmt.Errorf("appending layers: %w", err)
 	}
