@@ -16,196 +16,40 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"sort"
 	"strings"
 	"sync"
 	"time"
 
-	"archive/tar"
-	"bytes"
 	"fmt"
-	"io"
-
-	"path/filepath"
 
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/daemon"
 	"github.com/google/go-containerregistry/pkg/v1/empty"
 	"github.com/google/go-containerregistry/pkg/v1/mutate"
-	//"github.com/google/go-containerregistry/pkg/v1/stream"
-	"github.com/google/go-containerregistry/pkg/v1/static"
 	"github.com/google/go-containerregistry/pkg/v1/tarball"
 	"github.com/google/go-containerregistry/pkg/v1/types"
 	"github.com/replicate/yolo/pkg/auth"
 
 	// "github.com/replicate/yolo/pkg/images"
+	"github.com/datakami/cognix/pkgs/yolo/nix"
 	"github.com/google/go-containerregistry/pkg/crane"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/spf13/cobra"
 )
 
 var (
-	writeLocal = false
+	writeLocal   = false
 	writeArchive = false
-	debugMode  = os.Getenv("DEBUG") != ""
-	sToken string
-	sRegistry string
+	debugMode    = os.Getenv("DEBUG") != ""
+	sToken       string
+	sRegistry    string
 )
-
 
 func debug(msg ...any) {
 	if debugMode {
 		fmt.Fprintln(os.Stderr, msg...)
 	}
-}
-
-// def archive_paths_to(obj, paths, mtime):
-//     """
-//     Writes the given store paths as a tar file to the given stream.
-//     obj: Stream to write to. Should have a 'write' method.
-//     paths: List of store paths.
-//     """
-//     # gettarinfo makes the paths relative, this makes them
-//     # absolute again
-//     def append_root(ti):
-//         ti.name = "/" + ti.name
-//         return ti
-//     def apply_filters(ti):
-//         ti.mtime = mtime
-//         ti.uid = 0
-//         ti.gid = 0
-//         ti.uname = "root"
-//         ti.gname = "root"
-//         return ti
-//     def nix_root(ti):
-//         ti.mode = 0o0555  # r-xr-xr-x
-//         return ti
-//     def dir(path):
-//         ti = tarfile.TarInfo(path)
-//         ti.type = tarfile.DIRTYPE
-//         return ti
-//     with tarfile.open(fileobj=obj, mode="w|") as tar:
-//         # To be consistent with the docker utilities, we need to have
-//         # these directories first when building layer tarballs.
-//         tar.addfile(apply_filters(nix_root(dir("/nix"))))
-//         tar.addfile(apply_filters(nix_root(dir("/nix/store"))))
-//         for path in paths:
-//             path = pathlib.Path(path)
-//             if path.is_symlink():
-//                 files = [path]
-//             else:
-//                 files = itertools.chain([path], path.rglob("*"))
-//             for filename in sorted(files):
-//                 ti = append_root(tar.gettarinfo(filename))
-//                 # copy hardlinks as regular files
-//                 if ti.islnk():
-//                     ti.type = tarfile.REGTYPE
-//                     ti.linkname = ""
-//                     ti.size = filename.stat().st_size
-//                 ti = apply_filters(ti)
-//                 if ti.isfile():
-//                     with open(filename, "rb") as f:
-//                         tar.addfile(ti, f)
-//                 else:
-//                     tar.addfile(ti)
-
-func appendRoot(ti *tar.Header) *tar.Header {
-	// python "gettarinfo makes the paths relative, this makes them absolute again"
-	// unclear what FileInfoHeader does
-	if ti.Name[0] != '/' {
-		ti.Name = "/" + ti.Name
-	}
-	return ti
-}
-func _applyFilters(mtime int64, ti *tar.Header) *tar.Header {
-	ti.ModTime = time.Unix(mtime, 0)
-	ti.Uid = 0
-	ti.Gid = 0
-	ti.Uname = "root"
-  ti.Gname = "root"
-	return ti
-}
-func nixRoot(ti *tar.Header) *tar.Header {
-	ti.Mode = 0o0555 // r-xr-xr-x
-	return ti
-}
-func dir(path string) *tar.Header {
-	ti := &tar.Header{Name: path, Typeflag: tar.TypeDir}
-	return ti
-}
-
-func getFilesForPath(path string) []string {
-	var files []string
-	if info, _ := os.Lstat(path); info.Mode()&os.ModeSymlink != 0 {
-		return []string{path}
-	}
-	_ = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-			files = append(files, path)
-		return nil
-	})
-	return files
-}
-
-func archivePaths(paths []string, mtime int64) *bytes.Buffer {
-	// Writes the given store paths as a tar file
-	// paths: List of store paths.
-	buf := new(bytes.Buffer)
-	tw := tar.NewWriter(buf)
-	applyFilters := func(ti *tar.Header) *tar.Header { return _applyFilters(mtime, ti) }
-
-	tw.WriteHeader(applyFilters(nixRoot(dir("/nix/"))))
-	tw.WriteHeader(applyFilters(nixRoot(dir("/nix/store/"))))
-	for _, path := range paths {
-		files := getFilesForPath(path)
-		// stable order
-		sort.Strings(files)
-
-		for _, filename := range files {
-			st, _ := os.Lstat(filename)
-			link := ""
-			if st.Mode() & os.ModeSymlink != 0 {
-				link_, err := os.Readlink(filename)
-				if err != nil {
-					panic(err)
-				}
-				link = link_
-			}
-			ti, _ := tar.FileInfoHeader(st, link)
-		  if st.IsDir() {
-				ti.Name = filename + "/"
-			} else {
-				ti.Name = filename
-			}
-			ti = appendRoot(ti)
-
-			// "copy hardlinks as regular files"
-			// I don't think go even is aware of hardlinks?
-			if ti.Typeflag == tar.TypeLink {
-				ti.Typeflag = tar.TypeReg
-				ti.Linkname = ""
-				deref_st, _ := os.Stat(filename)
-				ti.Size = deref_st.Size()
-			}
-			ti = applyFilters(ti)
-			// TODO: Go writes devmajor and devminor as '0000000', python and gnu tar write them
-			// as \x00. This means the checksums are different.
-			if ti.Typeflag == tar.TypeReg {
-				f, _ := os.Open(filename)
-				// this really needs to be done in parallel
-				// but it needs to be in a consistent order
-				// maybe look at the size of everything, precompute indexes into the tarball
-				tw.WriteHeader(ti)
-				io.Copy(tw, f)
-				f.Close()
-			} else {
-				tw.WriteHeader(ti)
-			}
-		}
-	}
-	tw.Close()
-
-	return buf
 }
 
 // def add_layer_dir(tar, paths, store_dir, mtime):
@@ -264,9 +108,7 @@ func addLayerDir(paths []string, mtime int64, layerType types.MediaType) mutate.
 	// 	return nil, fmt.Errorf("getting base image media type: %w", err)
 	// }
 
-	layerData := archivePaths(paths, int64(mtime))
-  layer := static.NewLayer(layerData.Bytes(), layerType)
-	// layer := stream.NewLayer(io.NopCloser(layerData), stream.WithMediaType(layerType))
+	layer := nix.NewLayer(paths, mtime, false, layerType)
 	history := v1.History{
 		Created: v1.Time{Time: time.Unix(mtime, 0)},
 		Comment: fmt.Sprintf("store paths: %s", paths),
@@ -316,10 +158,10 @@ func addCustomizationLayer(customisation_layer string, mtime int64, layerType ty
 	// 	// }
 	// 	// path := fmt.Sprintf("%s/layer.tar", checksum)
 	path := fmt.Sprintf("%s/layer.tar", customisation_layer)
-				layer, err := tarball.LayerFromFile(path, tarball.WithMediaType(layerType))
-				if err != nil {
-								panic(err)
-				}
+	layer, err := tarball.LayerFromFile(path, tarball.WithMediaType(layerType))
+	if err != nil {
+		panic(err)
+	}
 	history := v1.History{
 		Created: v1.Time{Time: time.Unix(int64(mtime), 0)},
 		Comment: fmt.Sprintf("store paths: %s", customisation_layer),
@@ -415,12 +257,10 @@ func pushMain(args []string) error {
 		layerType = types.OCIUncompressedLayer
 	}
 
-	start := 1
 	layers := make([]mutate.Addendum, len(conf.StoreLayers)+1)
 	var wg sync.WaitGroup
 	wg.Add(len(conf.StoreLayers) + 1)
 	for index, store_layer := range conf.StoreLayers {
-		fmt.Fprintln(os.Stderr, "Creating layer", start+index, "from paths:", store_layer)
 		/* go */ func(index int, store_layer []string) {
 			defer wg.Done()
 			layers[index] = addLayerDir(store_layer, mtime, layerType)
@@ -465,7 +305,7 @@ func pushMain(args []string) error {
 	// }
 	configFile, err = image.ConfigFile()
 	if err != nil {
-					panic(err)
+		panic(err)
 	}
 	configFile.Config = overlayBaseConfig(configFile.Config, conf.Config)
 	configFile.Created = v1.Time{Time: created}
