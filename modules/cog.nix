@@ -90,6 +90,8 @@ in {
       "${config.paths.projectRoot}"
                else "${config.paths.projectRoot}/${config.paths.package}";
 
+    cognix.environment.PYTHONUNBUFFERED = true;
+
     dockerTools.streamLayeredImage = {
       passthru.entirePackage = entirePackage;
       # glibc.out is needed for gpu
@@ -105,7 +107,7 @@ in {
         ] ++ resolvedSystemPackages;
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
-        Env = [ "PYTHONUNBUFFERED=1" ];
+        Env = lib.mapAttrsToList (name: val: "${name}=${toString val}") config.cognix.environment;
         EXPOSE = 5000;
         CMD = [ "python" "-m" "cog.server.http" ];
         WorkingDir = "/src";

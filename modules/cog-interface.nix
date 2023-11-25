@@ -71,6 +71,10 @@ in
       '';
       description = "Commands to run after gathering all the files for the container /src dir";
     };
+    environment = mkOption {
+      type = types.attrsOf types.anything;
+      default = {};
+    };
   };
   options.python-env = with lib; mkOption {
     type = types.submoduleWith {
