@@ -127,6 +127,7 @@ in {
       # fixed in https://github.com/NixOS/nixpkgs/pull/260063
       extraCommands = ''
         mkdir tmp
+        mkdir -p var/run
         ln -s ca-bundle.crt etc/ssl/certs/ca-certificates.crt
       '';
       extraJSONFile = generateJSON ''
