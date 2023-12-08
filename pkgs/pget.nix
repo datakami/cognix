@@ -1,16 +1,20 @@
 { buildGoModule, fetchFromGitHub, lib }:
 buildGoModule (rec {
   pname = "pget";
-  version = "0.1.1";
+  version = "0.3.1";
   src = fetchFromGitHub {
     owner = "replicate";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-nKJCKN55a3wE3DE0cuIMEcXa7hVu9lBM1/uX/ojDmL8=";
+    hash = "sha256-cS6CCCgrkgWu2wklmoBeHkGdhGuRnV84f0GMEjdT8NM=";
   };
-  vendorHash = "sha256-elbFgpLf6dzg1xqWQgg9Vz0GtQkU5cBuC0q7WYIiWLM=";
+  vendorHash = "sha256-YGP7BQhOuBriKceUYdcvB6UJZ2KJX+2LNbE3f4GvXCo=";
   ldflags = [
-    "-w" "-s"
+    "-X github.com/replicate/pget/pkg/version.Version=${version}"
+    # "-X github.com/replicate/pget/pkg/version.CommitHash=${src.rev}"
+    # not reproducible!:
+    # "-X github.com/replicate/pget/pkg/version.BuildTime=$(BUILD_TIME)"
+    "-w"
   ];
 
   meta = with lib; {
