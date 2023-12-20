@@ -94,6 +94,7 @@ in {
 
     dockerTools.streamLayeredImage = {
       passthru.entirePackage = entirePackage;
+      maxLayers = lib.mkDefault 110;
       # glibc.out is needed for gpu
       contents = with pkgs;
         [
