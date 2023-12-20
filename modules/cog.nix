@@ -39,7 +39,7 @@ let
   addLabelPrefix = labels: (mapAttrNames (x: "run.cog.${x}") labels) // (mapAttrNames (x: "org.cogmodel.${x}") labels);
   # hack: replicate calls "pip -U cog" before starting
   fakePip = pkgs.writeShellScriptBin "pip" ''
-    echo "$@"
+    echo "this is not a pip (cognix)"
   '';
   # resolve system_packages to cognix.systemPackages
   resolvedSystemPackages = map (pkg:
