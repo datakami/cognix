@@ -104,6 +104,7 @@ in {
           entirePackage
           fakePip
           glibc.out
+          curl
         ] ++ resolvedSystemPackages;
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
