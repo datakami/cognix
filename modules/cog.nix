@@ -91,6 +91,8 @@ in {
                else "${config.paths.projectRoot}/${config.paths.package}";
 
     cognix.environment.PYTHONUNBUFFERED = true;
+    cognix.environment.LD_LIBRARY_PATH =
+      lib.mkIf config.cognix.addCudaLibraryPath "/usr/lib64:/usr/local/nvidia/lib64";
 
     dockerTools.streamLayeredImage = {
       passthru.entirePackage = entirePackage;

@@ -71,6 +71,14 @@ in
       '';
       description = "Commands to run after gathering all the files for the container /src dir";
     };
+    addCudaLibraryPath = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to add the CUDA paths from docker-nvidia to LD_LIBRARY_PATH.
+        Disable to sanity check your dependencies.
+      '';
+    };
     environment = mkOption {
       type = types.attrsOf types.anything;
       default = {};
