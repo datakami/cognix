@@ -7,28 +7,61 @@ from pathlib import Path
 
 @click.group()
 @click.option("--pkg", default=None, help="subpackage to build")
+@click.option("--print-build-logs", "-L", is_flag=True)
+@click.option("--impure", is_flag=True)
+@click.option("--show-trace", is_flag=True)
+@click.option("--verbose", "-v", is_flag=True)
+@click.option("--option", multiple=True, nargs=2, type=str)
 @click.pass_context
-def cli(ctx, pkg):
+def cli(ctx, pkg, print_build_logs, impure, show_trace, verbose, option):
     ctx.ensure_object(dict)
     if pkg is None:
         if Path("flake.nix").exists():
             pkg = "default"
         else:
             pkg = Path(".").resolve().name
+        if verbose:
+            print("defaulting to package", pkg)
     ctx.obj["PKG"] = pkg
+    fl = []
+    if print_build_logs:
+        fl.append("--print-build-logs")
+    if impure:
+        fl.append("--impure")
+    if show_trace:
+        fl.append("--show-trace")
+    if verbose:
+        fl.append("--verbose")
+    for (n, v) in option:
+        if v in ("true", "True"):
+            fl.append("--" + n)
+        elif v in ("false", "False"):
+            fl.append("--no-" + n)
+        else:
+            fl.append("--" + n)
+            fl.append(v)
+    ctx.obj["verbose"] = verbose
+    ctx.obj["nix-flags"] = fl
    
+def call_nix(ctx, command, target, extra_flags=[], capture_output=False):
+    invocation = ["nix", command] + ctx.obj["nix-flags"] + [ ".#" + ctx.obj["PKG"] + target ] + extra_flags
+    if ctx.obj["verbose"]:
+        # todo quotes
+        print("$", " ".join(invocation))
+    return subprocess.run(invocation, check=True, capture_output=capture_output)
+
 # - cognix init
 
 @cli.command()
 @click.pass_context
 def lock(cli):
-    subprocess.run(["nix", "run", ".#" + cli.obj["PKG"] + ".lock"], check=True)
+    call_nix(cli, "run", ".lock")
     # todo: add lockfile to git (git add --intend-to-add?)
 
 @cli.command()
 @click.pass_context
 def build(cli):
-    subprocess.run(["nix", "build", ".#" + cli.obj["PKG"], "--no-link"], check=True)
+    call_nix(cli, "build", "", ["--no-link"])
 
 def get_tag(cmd: str) -> str:
     with open(cmd, "r") as f:
@@ -42,7 +75,7 @@ def get_tag(cmd: str) -> str:
 @click.pass_context
 def load(cli):
     cli.invoke(build)
-    f = subprocess.run(["nix", "build", ".#" + cli.obj["PKG"], "--json", "--no-link"], check=True, capture_output=True)
+    f = call_nix(cli, "build", "", ["--json", "--no-link"], capture_output=True)
     result = json.loads(f.stdout)
     cmd = result[0]["outputs"]["out"]
     tag = get_tag(cmd)
@@ -71,7 +104,7 @@ def push(cli, name):
 @click.pass_context
 def push_weights(cli):
     # todo: gcloud login
-    subprocess.run(["nix", "run", ".#" + cli.obj["PKG"] + ".push-weights"], check=True)
+    call_nix(cli, "run", ".push-weights")
 
 @cli.command()
 @click.pass_context
