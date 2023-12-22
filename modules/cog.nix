@@ -44,7 +44,7 @@ let
   # resolve system_packages to cognix.systemPackages
   resolvedSystemPackages = map (pkg:
     if lib.isDerivation pkg then pkg else
-      config.cognix.systemPackages.${pkg}) cfg.system_packages;
+      config.cognix.systemPackages.${pkg} or pkgs.${pkg}) cfg.system_packages;
 
   generateJSON = args: files: pkgs.runCommand "generated-json.json" {
     nativeBuildInputs = [ pkgs.jq ];
