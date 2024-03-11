@@ -1,10 +1,10 @@
 { stdenv, fetchurl }:
 stdenv.mkDerivation rec {
   pname = "cog";
-  version = "0.8.6";
+  version = "0.9.4";
   src = fetchurl {
     url = "https://github.com/replicate/cog/releases/download/v${version}/cog_linux_x86_64";
-    hash = "sha256-Ng62tbRmlrL23JRdP3Zt4nT8JfLrHThF0mmMf1jee7g=";
+    hash = "sha256-tULhTzhC4mE4ic80oecrVtkMBLSTunqyKNOjiRqTTcM=";
   };
   dontUnpack = true;
   installPhase = ''
