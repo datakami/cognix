@@ -1,14 +1,14 @@
-{ buildGo121Module, fetchFromGitHub, lib }:
-buildGo121Module (rec {
+{ buildGo122Module, fetchFromGitHub, lib }:
+buildGo122Module (rec {
   pname = "pget";
-  version = "0.5.4";
+  version = "0.7.1";
   src = fetchFromGitHub {
     owner = "replicate";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-FWK1tOzj6+A0vYXH35ZdQgLu5BFVBwknw6SlPifHbp4=";
+    hash = "sha256-oABvqeEdq1gxM8aoGkjPw1xTV8SG29M9g77NJ4ko/NM=";
   };
-  vendorHash = "sha256-A5xfD4ykk34JDt7h976rKJD87KkeQ2rIY2tIfhjdO9g=";
+  vendorHash = "sha256-Jx5d+wCmwXa/XqdrSTxW58ZVZPvYXn4fnxRREUFjerg=";
   ldflags = [
     "-X github.com/replicate/pget/pkg/version.Version=${version}"
     # "-X github.com/replicate/pget/pkg/version.CommitHash=${src.rev}"
