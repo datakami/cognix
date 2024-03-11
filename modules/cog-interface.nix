@@ -34,7 +34,7 @@ in
       };
       cog_version = mkOption {
         type = types.str;
-        default = "0.8.6";
+        default = "0.9.4";
       };
     };
     predict = mkOption {
