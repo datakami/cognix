@@ -3,7 +3,7 @@
   inputs = {
     dream2nix.url = "github:yorickvp/dream2nix";
     nixpkgs.follows = "dream2nix/nixpkgs";
-    flake-parts.follows = "dream2nix/flake-parts";
+    flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
   outputs = { self, dream2nix, nixpkgs, flake-parts }@inputs:
