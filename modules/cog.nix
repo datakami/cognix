@@ -66,7 +66,7 @@ let
       };
     };
   };
-  toCogPythonVersion = builtins.replaceStrings ["-beta"] ["b"];
+  toCogPythonVersion = builtins.replaceStrings ["-alpha" "-beta"] ["a" "b"];
 in {
   imports = [
     ./cog-interface.nix
