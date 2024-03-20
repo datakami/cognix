@@ -56,6 +56,11 @@
                 cognix-weights = prev.callPackage ./pkgs/cognix-weights {};
                 cognix-cli = prev.callPackage ./pkgs/cognix-cli {};
                 cog = prev.callPackage ./pkgs/cog.nix {};
+                lib = prev.lib.extend (finall: prevl: {
+                  trivial = prevl.trivial // {
+                    revisionWithDefault = default: nixpkgs.rev or default;
+                  };
+                });
               })
             ];
           };

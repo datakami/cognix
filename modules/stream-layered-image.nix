@@ -111,6 +111,13 @@ in
         Use this to add things only available at build time, such as other build results.
       '';
     };
+    includeNixDB = mkOption {
+      default = false;
+      type = types.bool;
+      description = ''
+        Whether to generate a Nix DB. The DB won't be merged between multiple stages.
+      '';
+    };
   };
 
   config.public = let
@@ -126,4 +133,24 @@ in
       patchLayeredImage orig_stream cfg.extraJSONFile
     else
       orig_stream) // { inherit (config) name; };
+  # todo base json, customisation layer deps!
+  config.dockerTools.streamLayeredImage.extraCommands = lib.mkIf cfg.includeNixDB ''
+    echo "Generating the nix database..."
+    echo "Warning: only the database of the deepest Nix layer is loaded."
+    echo "         If you want to use nix commands in the container, it would"
+    echo "         be better to only have one layer that contains a nix store."
+
+    export NIX_REMOTE=local?root=$PWD
+    # A user is required by nix
+    # https://github.com/NixOS/nix/blob/9348f9291e5d9e4ba3c4347ea1b235640f54fd79/src/libutil/util.cc#L478
+    export USER=nobody
+    ${pkgs.buildPackages.nix}/bin/nix-store --load-db < ${pkgs.closureInfo {rootPaths = cfg.contents;}}/registration
+    # Reset registration times to make the image reproducible
+    ${pkgs.buildPackages.sqlite}/bin/sqlite3 nix/var/nix/db/db.sqlite "UPDATE ValidPaths SET registrationTime = ''${SOURCE_DATE_EPOCH}"
+
+    mkdir -p nix/var/nix/gcroots/docker/
+    for i in ${lib.concatStringsSep " " cfg.contents}; do
+    ln -s $i nix/var/nix/gcroots/docker/$(basename $i)
+    done;
+  '';
 }

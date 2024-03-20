@@ -83,6 +83,14 @@ in
       type = types.attrsOf types.anything;
       default = {};
     };
+    includeNix = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Whether to add Nix to the image so it can be used to install more packages at run-time.
+        This also sets the NIX_PATH so nixpkgs points to the nixpkgs used in cognix.
+      '';
+    };
   };
   options.python-env = with lib; mkOption {
     type = types.submoduleWith {
