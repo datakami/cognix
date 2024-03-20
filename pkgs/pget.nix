@@ -1,14 +1,14 @@
 { buildGo122Module, fetchFromGitHub, lib }:
 buildGo122Module (rec {
   pname = "pget";
-  version = "0.7.1";
+  version = "0.6.2";
   src = fetchFromGitHub {
     owner = "replicate";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-oABvqeEdq1gxM8aoGkjPw1xTV8SG29M9g77NJ4ko/NM=";
+    hash = "sha256-vutkaw7UOpGk1LxHBH13SlQ4YdOzHVduVqedoFGhsfw=";
   };
-  vendorHash = "sha256-Jx5d+wCmwXa/XqdrSTxW58ZVZPvYXn4fnxRREUFjerg=";
+  vendorHash = "sha256-U+ZoROoaJuvxExFVmUOBslybx2dEgejwfLs6eJvS91o=";
   ldflags = [
     "-X github.com/replicate/pget/pkg/version.Version=${version}"
     # "-X github.com/replicate/pget/pkg/version.CommitHash=${src.rev}"
