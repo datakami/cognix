@@ -40,6 +40,7 @@ let
   # hack: replicate calls "pip -U cog" before starting
   fakePip = pkgs.writeShellScriptBin "pip" ''
     echo "this is not a pip (cognix)"
+    echo "hint: python -m pip"
   '';
   # resolve system_packages to cognix.systemPackages
   resolvedSystemPackages = map (pkg:
@@ -67,6 +68,9 @@ let
     };
   };
   toCogPythonVersion = builtins.replaceStrings ["-alpha" "-beta"] ["a" "b"];
+  pyEnvWithPip = config.python-env.public.pyEnv.override {
+    postBuild = "$out/bin/python -m ensurepip";
+  };
 in {
   imports = [
     ./cog-interface.nix
@@ -107,7 +111,7 @@ in {
           bashInteractive
           busybox
           cacert
-          config.python-env.public.pyEnv
+          pyEnvWithPip
           entirePackage
           fakePip
           glibc.out
@@ -154,7 +158,7 @@ in {
     };
     openapi-spec = lib.mkDefault (pkgs.runCommand "openapi.json" {} ''
       cd ${entirePackage}/src
-      ${config.python-env.public.pyEnv}/bin/python -m cog.command.openapi_schema > $out
+      ${pyEnvWithPip}/bin/python -m cog.command.openapi_schema > $out
     '');
     python-env = {
       imports = [
