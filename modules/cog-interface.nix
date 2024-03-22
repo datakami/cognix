@@ -46,6 +46,11 @@ in
       default = null;
       example = "train.py:train";
     };
+    concurrency = mkOption {
+      type = types.int;
+      default = 1;
+      description = "Allowed concurrency";
+    };
   };
   options.cognix = with lib; {
     systemPackages = mkOption {
