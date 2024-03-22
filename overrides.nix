@@ -8,4 +8,8 @@
   nvidia-cublas-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
   nvidia-cudnn-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
   nvidia-curand-cu11.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
+
+  nvidia-cublas-cu12.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
+  nvidia-cudnn-cu12.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
+  nvidia-curand-cu12.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
 }
