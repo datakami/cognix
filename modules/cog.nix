@@ -94,6 +94,7 @@ in {
       "${config.paths.projectRoot}"
                else "${config.paths.projectRoot}/${config.paths.package}";
 
+    cognix.environment.NVIDIA_DRIVER_CAPABILITIES = "all";
     cognix.environment.PYTHONUNBUFFERED = true;
     cognix.environment.LD_LIBRARY_PATH =
       lib.mkIf config.cognix.addCudaLibraryPath "/usr/lib64:/usr/local/nvidia/lib64";
@@ -141,7 +142,7 @@ in {
       # fixed in https://github.com/NixOS/nixpkgs/pull/260063
       extraCommands = ''
         mkdir tmp
-        mkdir -p var/run
+        mkdir -p var/run run
         ln -s ca-bundle.crt etc/ssl/certs/ca-certificates.crt
       '';
       extraJSONFile = generateJSON ''
