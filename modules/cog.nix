@@ -157,7 +157,7 @@ in {
     lock = {
       inherit (config.python-env.public.config.lock) fields invalidationData;
     };
-    openapi-spec = lib.mkDefault (pkgs.runCommand "openapi.json" {} ''
+    openapi-spec = lib.mkDefault (pkgs.runCommand "openapi.json" cognixcfg.environment ''
       cd ${entirePackage}/src
       ${pyEnvWithPip}/bin/python -m cog.command.openapi_schema > $out
     '');
