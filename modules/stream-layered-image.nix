@@ -6,7 +6,9 @@ let cfg = config.dockerTools.streamLayeredImage;
     streamScript = pkgs.writers.writePython3 "stream" {} (pkgs.path + "/pkgs/build-support/docker/stream_layered_image.py");
     patchJson = img: extraJSON: pkgs.runCommand "patched-${img.imageName}-conf.json" {
       preferLocalBuild = true;
-      nativeBuildInputs = [ pkgs.jq ];
+      nativeBuildInputs = [ pkgs.jq pkgs.python3 ];
+      exportReferencesGraph.graph = img;
+      __structuredAttrs = true;
     } ''
       outName="$(basename "$out")"
       outHash=$(echo "$outName" | cut -d - -f 1)
@@ -15,6 +17,7 @@ let cfg = config.dockerTools.streamLayeredImage;
         "repo_tag": $repo_tag
       }' --arg repo_tag "${img.imageName}:$outHash" \
       "$json_path" "${extraJSON}" > $out
+      python3 ${./coalesce-layers.py} "$NIX_ATTRS_JSON_FILE" ${toString cfg.maxLayers} $out
     '';
     patchLayeredImage = img: extraJSON: pkgs.runCommand "stream-${img.imageName}" {
       passthru = img.passthru // { wrapped = img; };
@@ -104,8 +107,8 @@ in
       description = "Passthru arguments for the underlying derivation.";
     };
     extraJSONFile = mkOption {
-      default = null;
-      type = types.nullOr types.path;
+      default = builtins.toFile "empty.json" "{}";
+      type = types.path;
       description = ''
         JSON file that's merged into the stream configuration.
         Use this to add things only available at build time, such as other build results.
@@ -129,10 +132,7 @@ in
         maxLayers includeStorePaths passthru;
     };
   in
-    (if cfg.extraJSONFile != null then
-      patchLayeredImage orig_stream cfg.extraJSONFile
-    else
-      orig_stream) // { inherit (config) name; };
+    (patchLayeredImage orig_stream cfg.extraJSONFile) // { inherit (config) name; };
   # todo base json, customisation layer deps!
   config.dockerTools.streamLayeredImage.extraCommands = lib.mkIf cfg.includeNixDB ''
     echo "Generating the nix database..."
