@@ -118,7 +118,7 @@ in {
           glibc.out
           curl
         ] ++ resolvedSystemPackages
-        ++ (lib.optional config.cognix.includeNix (nix.override { enableDocumentation = false; }));
+        ++ (lib.optional config.cognix.includeNix pkgs.pkgsStatic.nix);
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
         Env = lib.mapAttrsToList (name: val: "${name}=${toString val}") config.cognix.environment;
