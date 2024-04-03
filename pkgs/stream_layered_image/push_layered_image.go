@@ -32,7 +32,7 @@ import (
 	"github.com/replicate/yolo/pkg/auth"
 
 	// "github.com/replicate/yolo/pkg/images"
-	"github.com/datakami/cognix/pkgs/yolo/nix"
+	"github.com/datakami/cognix/pkgs/stream_layered_image/nix"
 	"github.com/google/go-containerregistry/pkg/crane"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/spf13/cobra"

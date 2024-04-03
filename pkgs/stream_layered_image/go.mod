@@ -1,6 +1,8 @@
-module github.com/datakami/cognix/pkgs/yolo
+module github.com/datakami/cognix/pkgs/stream_layered_image
 
-go 1.20
+go 1.21.0
+
+toolchain go1.21.6
 
 require (
 	github.com/google/go-containerregistry v0.16.1
@@ -18,7 +20,6 @@ require (
 	github.com/docker/docker-credential-helpers v0.7.0 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
-	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect

@@ -61,7 +61,7 @@
                     revisionWithDefault = default: nixpkgs.rev or default;
                   };
                 });
-                stream_layered_image = prev.callPackage ./pkgs/yolo/default.nix {};
+                stream_layered_image = prev.callPackage ./pkgs/stream_layered_image/default.nix {};
               })
             ];
           };

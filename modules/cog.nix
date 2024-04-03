@@ -146,7 +146,7 @@ in {
         ln -s ca-bundle.crt etc/ssl/certs/ca-certificates.crt
       '';
       streamScript = pkgs.writeShellScript "stream" ''
-        exec ${pkgs.stream_layered_image}/bin/yolo stream_layered_image "$@"
+        exec ${pkgs.stream_layered_image}/bin/stream_layered_image stream_layered_image "$@"
       '';
       extraJSONFile = generateJSON ''
         {
