@@ -59,9 +59,14 @@ def lock(cli):
     # todo: add lockfile to git (git add --intend-to-add?)
 
 @cli.command()
+# @click.option("-t", "--tag", default="")
 @click.pass_context
 def build(cli):
     call_nix(cli, "build", "", ["--no-link"])
+    # hash = cli.invoke(load)
+    # if tag:
+    #     subprocess.run(["docker", "tag", hash, tag], check=True)
+
 
 def get_tag(cmd: str) -> str:
     with open(cmd, "r") as f:
