@@ -15,6 +15,8 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -29,7 +31,6 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/mutate"
 	"github.com/google/go-containerregistry/pkg/v1/tarball"
 	"github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/replicate/yolo/pkg/auth"
 
 	// "github.com/replicate/yolo/pkg/images"
 	"github.com/datakami/cognix/pkgs/stream_layered_image/nix"
@@ -40,7 +41,7 @@ import (
 
 var (
 	writeLocal   = false
-	pushRemote   = false
+	pushRemote   string
 	writeArchive = false
 	debugMode    = os.Getenv("DEBUG") != ""
 	sToken       string
@@ -231,6 +232,8 @@ func checkValidPaths(conf Conf) error {
 }
 
 func pushMain(args []string) error {
+	fmt.Println("pushRemote is", pushRemote)
+	fmt.Println("sToken is", sToken)
 	conf_bytes, _ := os.ReadFile(args[0])
 	var conf Conf
 	err := json.Unmarshal(conf_bytes, &conf)
@@ -325,7 +328,7 @@ func pushMain(args []string) error {
 	// RepoTags are a property of the tarball image representation, not the image itself
 	// we could tag it, but that gets passed to crane.Push seately
 
-	if !writeArchive && !writeLocal && !pushRemote {
+	if !writeArchive && !writeLocal && pushRemote == "" {
 		writeArchive = true
 	}
 	if writeArchive {
@@ -346,9 +349,9 @@ func pushMain(args []string) error {
 			return fmt.Errorf("writing to local daemon: %w", err)
 		}
 	}
-	if pushRemote {
+	if pushRemote != "" {
 		auth := getAuth()
-		_, err = pushImage(image, conf.RepoTag, auth)
+		_, err = pushImage(image, pushRemote, auth)
 		if err != nil {
 			return fmt.Errorf("pushing image: %w", err)
 		}
@@ -375,6 +378,40 @@ func pushImage(img v1.Image, dest string, auth authn.Authenticator) (string, err
 	return image_id, nil
 }
 
+func addressWithScheme(address string) string {
+	if strings.Contains(address, "://") {
+		return address
+	}
+	return "https://" + address
+}
+
+func VerifyCogToken(registryHost string, token string) (username string, err error) {
+	if token == "" {
+		return "", fmt.Errorf("token is required")
+	}
+
+	resp, err := http.PostForm(addressWithScheme(registryHost)+"/cog/v1/verify-token", url.Values{
+		"token": []string{token},
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to verify token: %w", err)
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		return "", fmt.Errorf("user does not exist")
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to verify token, got status %d", resp.StatusCode)
+	}
+	defer resp.Body.Close()
+	body := &struct {
+		Username string `json:"username"`
+	}{}
+	if err := json.NewDecoder(resp.Body).Decode(body); err != nil {
+		return "", err
+	}
+	return body.Username, nil
+}
+
 func getAuth() authn.Authenticator {
 	if sToken == "" {
 		sToken = os.Getenv("REPLICATE_API_TOKEN")
@@ -384,7 +421,8 @@ func getAuth() authn.Authenticator {
 		sToken = os.Getenv("COG_TOKEN")
 	}
 
-	u, err := auth.VerifyCogToken(sRegistry, sToken)
+	u, err := VerifyCogToken(sRegistry, sToken)
+	fmt.Println("got VerifyCogToken")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "authentication error, invalid token or registry host error")
 	}
@@ -404,8 +442,8 @@ func newPushLayeredImageCommand() *cobra.Command {
 		Args:   cobra.ExactArgs(1),
 	}
 	cmd.Flags().BoolVarP(&writeLocal, "local", "l", false, "write to local daemon")
-	cmd.Flags().BoolVarP(&pushRemote, "push", "p", false, "push to a remote repository")
-	cmd.Flags().BoolVarP(&writeArchive, "archive", "a", false, "write tar file to stdout")
 	cmd.Flags().StringVarP(&sToken, "token", "t", "", "replicate api token")
+	cmd.Flags().StringVarP(&pushRemote, "push", "p", "", "push to a remote repository by name")
+	cmd.Flags().BoolVarP(&writeArchive, "archive", "a", false, "write tar file to stdout")
 	return cmd
 }
