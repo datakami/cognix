@@ -45,7 +45,7 @@ var (
 	writeArchive = false
 	debugMode    = os.Getenv("DEBUG") != ""
 	sToken       string
-	sRegistry    string
+	sRegistry    string = "r8.im"
 )
 
 func debug(msg ...any) {
@@ -232,8 +232,6 @@ func checkValidPaths(conf Conf) error {
 }
 
 func pushMain(args []string) error {
-	fmt.Println("pushRemote is", pushRemote)
-	fmt.Println("sToken is", sToken)
 	conf_bytes, _ := os.ReadFile(args[0])
 	var conf Conf
 	err := json.Unmarshal(conf_bytes, &conf)
@@ -442,8 +440,8 @@ func newPushLayeredImageCommand() *cobra.Command {
 		Args:   cobra.ExactArgs(1),
 	}
 	cmd.Flags().BoolVarP(&writeLocal, "local", "l", false, "write to local daemon")
-	cmd.Flags().StringVarP(&sToken, "token", "t", "", "replicate api token")
 	cmd.Flags().StringVarP(&pushRemote, "push", "p", "", "push to a remote repository by name")
 	cmd.Flags().BoolVarP(&writeArchive, "archive", "a", false, "write tar file to stdout")
+	cmd.Flags().StringVarP(&sToken, "token", "t", "", "replicate api token")
 	return cmd
 }
