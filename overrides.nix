@@ -12,4 +12,12 @@
   nvidia-cublas-cu12.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
   nvidia-cudnn-cu12.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
   nvidia-curand-cu12.env.appendRunpaths = [ "/usr/lib64" "$ORIGIN" ];
+
+  mpi4py = { config, lib, ... }: {
+    mkDerivation.buildInputs = [ config.deps.openmpi ];
+    mkDerivation.nativeBuildInputs = [ config.deps.openmpi ];
+    deps = { nixpkgs, ... }: {
+      openmpi = lib.mkDefault nixpkgs.openmpi;
+    };
+  };
 }

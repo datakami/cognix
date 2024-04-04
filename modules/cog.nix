@@ -1,4 +1,4 @@
-{ config, lib, dream2nix, pkgs, ... }:
+{ config, lib, dream2nix, pkgs, extendModules, ... }:
 let
   cognixcfg = config.cognix;
   cfg = config.cog.build;
@@ -102,6 +102,8 @@ in {
       nixpkgsVer = pkgs.lib.trivial.revisionWithDefault "nixos-unstable";
       in lib.mkIf config.cognix.includeNix
       "nixpkgs=https://github.com/nixos/nixpkgs/archive/refs/heads/${nixpkgsVer}.tar.xz";
+    # allow overriding via extendModules
+    public.extendModules = extendModules;
 
     dockerTools.streamLayeredImage = {
       passthru.entirePackage = entirePackage;
