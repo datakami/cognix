@@ -61,6 +61,7 @@
                     revisionWithDefault = default: nixpkgs.rev or default;
                   };
                 });
+                stream_layered_image = prev.callPackage ./pkgs/stream_layered_image/default.nix {};
               })
             ];
           };
@@ -75,6 +76,9 @@
           devShells.default = with pkgs; mkShell {
             nativeBuildInputs = [ cognix-cli ];
           };
+          devShells.stream_layered_image = with pkgs; mkShell {
+            nativeBuildInputs = [ go gopls ];
+          };
           packages.default = pkgs.cognix-cli;
           checks.default = pkgs.linkFarm "all-checks" (pkgs.lib.mapAttrsToList
             (name: path: {
@@ -82,7 +86,7 @@
               path = if pkgs.lib.isDerivation path then path else "/dev/null";
             }) config.legacyPackages);
           legacyPackages = {
-            inherit (pkgs) pget cognix-weights cognix-cli cog;
+            inherit (pkgs) pget cognix-weights cognix-cli cog stream_layered_image;
             callCognix = import ./default.nix {
               inherit pkgs dream2nix;
             };

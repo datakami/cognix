@@ -1,9 +1,8 @@
-{ config, lib, dream2nix, packageSets, ... }:
+{ config, lib, dream2nix, options, packageSets, ... }:
 let cfg = config.dockerTools.streamLayeredImage;
     pkgs = packageSets.nixpkgs;
     # todo: upstream 'extraJSONFile' into nix docker-tools
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/docker/default.nix#L1015
-    streamScript = pkgs.writers.writePython3 "stream" {} (pkgs.path + "/pkgs/build-support/docker/stream_layered_image.py");
     patchJson = img: extraJSON: pkgs.runCommand "patched-${img.imageName}-conf.json" {
       preferLocalBuild = true;
       nativeBuildInputs = [ pkgs.jq pkgs.python3 ];
@@ -24,11 +23,19 @@ let cfg = config.dockerTools.streamLayeredImage;
       preferLocalBuild = true;
       nativeBuildInputs = [ pkgs.makeWrapper ];
     } ''
-      makeWrapper ${streamScript} $out --add-flags ${patchJson img extraJSON}
+      makeWrapper ${cfg.streamScript} $out --add-flags ${
+        if extraJSON != null then
+          patchJson img extraJSON else
+            ''$(grep -o '/nix/store/[^ ]*-conf.json' < ${img})''}
     '';
 in
 {
   options.dockerTools.streamLayeredImage = with lib; {
+    streamScript = mkOption {
+      type = types.path;
+      default = pkgs.writers.writePython3 "stream" {} (pkgs.path + "/pkgs/build-support/docker/stream_layered_image.py");
+      description = "Path to streaming script";
+    };
     tag = mkOption {
       type = types.nullOr types.str;
       default = null;
