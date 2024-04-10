@@ -15,6 +15,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -32,20 +33,20 @@ import (
 	"github.com/google/go-containerregistry/pkg/v1/tarball"
 	"github.com/google/go-containerregistry/pkg/v1/types"
 
-	// "github.com/replicate/yolo/pkg/images"
 	"github.com/datakami/cognix/pkgs/stream_layered_image/nix"
 	"github.com/google/go-containerregistry/pkg/crane"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
+
+	"github.com/google/go-containerregistry/pkg/logs"
 )
 
 var (
-	writeLocal   = false
-	pushRemote   string
-	writeArchive = false
-	debugMode    = os.Getenv("DEBUG") != ""
-	sToken       string
-	sRegistry    string = "r8.im"
+	debugMode = false
+	sToken    string
+	sTag      string
+	sRegistry string = "r8.im"
 )
 
 func debug(msg ...any) {
@@ -237,15 +238,20 @@ func checkValidPaths(conf Conf) error {
 	return nil
 }
 
-func pushMain(args []string) error {
-	conf_bytes, _ := os.ReadFile(args[0])
+func makeImage(specfile string) (error, v1.Image, *name.Tag) {
+	conf_bytes, _ := os.ReadFile(specfile)
 	var conf Conf
 	err := json.Unmarshal(conf_bytes, &conf)
 	if err != nil {
-		return fmt.Errorf("parsing config: %w", err)
+		return fmt.Errorf("parsing config: %w", err), nil, nil
 	}
 
 	checkValidPaths(conf)
+
+	tag, err := name.NewTag(conf.RepoTag)
+	if err != nil {
+		return fmt.Errorf("parsing tag: %w", err), nil, nil
+	}
 
 	created := time.Now()
 	if conf.Created != "now" {
@@ -255,7 +261,7 @@ func pushMain(args []string) error {
 
 	configFile := &v1.ConfigFile{}
 	if conf.FromImage != "" {
-		return fmt.Errorf("we don't support base images yet")
+		return fmt.Errorf("we don't support base images yet"), nil, &tag
 	}
 
 	baseMediaType := types.DockerManifestSchema1
@@ -290,7 +296,7 @@ func pushMain(args []string) error {
 	debug("running mutate.Append(from_image, layers...)")
 	image, err := mutate.Append(empty.Image, layers...)
 	if err != nil || image == nil {
-		return fmt.Errorf("appending layers: %w", err)
+		return fmt.Errorf("appending layers: %w", err), nil, &tag
 	}
 	debug("resulting image is now:", image)
 
@@ -324,43 +330,12 @@ func pushMain(args []string) error {
 	debug("running mutate.ConfigFile(image, configFile)")
 	image, err = mutate.ConfigFile(image, configFile)
 
-	debug("resulting image is now:", image)
+	//debug("resulting image is now:", image)
 	if err != nil {
-		return fmt.Errorf("setting config file: %w", err)
+		return fmt.Errorf("setting config file: %w", err), nil, &tag
 	}
 
-	// RepoTags are a property of the tarball image representation, not the image itself
-	// we could tag it, but that gets passed to crane.Push seately
-
-	if !writeArchive && !writeLocal && pushRemote == "" {
-		writeArchive = true
-	}
-	if writeArchive {
-		newTag, err := name.NewTag(conf.RepoTag)
-		if err != nil {
-			panic(err)
-		}
-		tarball.Write(newTag, image, os.Stdout)
-	}
-	if writeLocal {
-		fmt.Println("writing to local daemon, tag:", conf.RepoTag)
-		tag, err := name.NewTag(conf.RepoTag)
-		if err != nil {
-			return fmt.Errorf("parsing tag: %w", err)
-		}
-		_, err = daemon.Write(tag, image)
-		if err != nil {
-			return fmt.Errorf("writing to local daemon: %w", err)
-		}
-	}
-	if pushRemote != "" {
-		auth := getAuth()
-		_, err = pushImage(image, pushRemote, auth)
-		if err != nil {
-			return fmt.Errorf("pushing image: %w", err)
-		}
-	}
-	return nil
+	return nil, image, &tag
 }
 
 func pushImage(img v1.Image, dest string, auth authn.Authenticator) (string, error) {
@@ -426,28 +401,125 @@ func getAuth() authn.Authenticator {
 	}
 
 	u, err := VerifyCogToken(sRegistry, sToken)
-	fmt.Println("got VerifyCogToken")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "authentication error, invalid token or registry host error")
 	}
 	return authn.FromConfig(authn.AuthConfig{Username: u, Password: sToken})
 }
 
-func pushLayeredImageCommmand(cmd *cobra.Command, args []string) error {
-	return pushMain(args)
+func getSpecFile(args []string) string {
+	specFile := os.Getenv("CN_SPEC_FILE")
+	if specFile == "" {
+		return args[0]
+	}
+	return specFile
+}
+
+func pushCommand(_ *cobra.Command, args []string) error {
+	err, image, _ := makeImage(getSpecFile(args))
+	if err != nil {
+		return err
+	}
+	auth := getAuth()
+	id, err := pushImage(image, args[1], auth)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(os.Stdout, "%s\n", id)
+	return nil
+}
+
+func loadCommand(_ *cobra.Command, args []string) error {
+	err, image, tag := makeImage(getSpecFile(args))
+	if sTag != "" {
+		pTag, err := name.NewTag(sTag)
+		if err != nil {
+			return fmt.Errorf("parsing tag: %w", err)
+		}
+		tag = &pTag
+	}
+	_, err = daemon.Write(*tag, image)
+	if err != nil {
+		return fmt.Errorf("writing to local daemon: %w", err)
+	}
+	fmt.Fprintf(os.Stdout, "%s\n", tag)
+	return nil
+}
+
+func dumpCommand(_ *cobra.Command, args []string) error {
+	err, image, tag := makeImage(getSpecFile(args))
+	if err != nil {
+		return fmt.Errorf("dumping archive: %w", err)
+	}
+	return tarball.Write(tag, image, os.Stdout)
+}
+
+func pushLayeredImageCommand(cmd *cobra.Command, args []string) error {
+	if term.IsTerminal(int(os.Stdout.Fd())) {
+		return cmd.Help()
+	} else {
+		fmt.Fprintln(os.Stderr, "Note: defaulting to `dump` mode because the output is redirected")
+		if len(args) != 1 {
+			return fmt.Errorf("accepts 1 arg, received %d", len(args))
+		}
+		return dumpCommand(cmd, args)
+	}
 }
 
 func newPushLayeredImageCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:    "stream_layered_image",
-		Short:  "update an existing image",
-		Hidden: false,
-		RunE:   pushLayeredImageCommmand,
-		Args:   cobra.ExactArgs(1),
+	specFileCnt := 0
+	specFileArg := " spec.json"
+	// support passing spec file through env variable
+	if os.Getenv("CN_SPEC_FILE") != "" {
+		specFileCnt = 1
+		specFileArg = ""
 	}
-	cmd.Flags().BoolVarP(&writeLocal, "local", "l", false, "write to local daemon")
-	cmd.Flags().StringVarP(&pushRemote, "push", "p", "", "push to a remote repository by name")
-	cmd.Flags().BoolVarP(&writeArchive, "archive", "a", false, "write tar file to stdout")
-	cmd.Flags().StringVarP(&sToken, "token", "t", "", "replicate api token")
+	cmd := &cobra.Command{
+		Use:     "stream_layered_image",
+		Short:   "docker image builder for nix-dockerTools",
+		Hidden:  false,
+		RunE:    pushLayeredImageCommand,
+		Args:    cobra.MaximumNArgs(1 - specFileCnt),
+		Version: "0.0.1",
+	}
+	cmd.PersistentFlags().BoolVarP(&debugMode, "debug", "d", false, "enable debug output")
+
+	push := &cobra.Command{
+		Use:   "push [-t token]" + specFileArg + " url",
+		RunE:  pushCommand,
+		Args:  cobra.ExactArgs(2 - specFileCnt),
+		Short: "push an image to an external registry",
+	}
+	push.Flags().StringVarP(&sToken, "token", "t", "", "replicate api token")
+	cmd.AddCommand(push)
+	load := &cobra.Command{
+		Use:   "load" + specFileArg,
+		RunE:  loadCommand,
+		Args:  cobra.ExactArgs(1 - specFileCnt),
+		Short: "load an image into a locally running docker daemon",
+	}
+	load.Flags().StringVarP(&sTag, "tag", "", "", "tagname, defaults to nix hash")
+	cmd.AddCommand(load)
+	cmd.AddCommand(
+		&cobra.Command{
+			Use:   "dump" + specFileArg,
+			RunE:  dumpCommand,
+			Args:  cobra.ExactArgs(1 - specFileCnt),
+			Short: "dump an image to stdout",
+		},
+	)
 	return cmd
+}
+
+func main() {
+	cmd := newPushLayeredImageCommand()
+
+	logs.Warn = log.New(os.Stderr, "gcr WARN: ", log.LstdFlags)
+	logs.Progress = log.New(os.Stderr, "gcr: ", log.LstdFlags)
+
+	if err := cmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }

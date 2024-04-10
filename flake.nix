@@ -76,6 +76,9 @@
           devShells.default = with pkgs; mkShell {
             nativeBuildInputs = [ cognix-cli ];
           };
+          devShells.stream_layered_image = with pkgs; mkShell {
+            nativeBuildInputs = [ go gopls ];
+          };
           packages.default = pkgs.cognix-cli;
           checks.default = pkgs.linkFarm "all-checks" (pkgs.lib.mapAttrsToList
             (name: path: {
