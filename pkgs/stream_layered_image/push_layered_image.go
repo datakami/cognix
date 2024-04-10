@@ -421,7 +421,12 @@ func pushCommand(_ *cobra.Command, args []string) error {
 		return err
 	}
 	auth := getAuth()
-	id, err := pushImage(image, args[1], auth)
+
+	url := args[0]
+	if os.Getenv("CN_SPEC_FILE") == "" {
+		url = args[1]
+	}
+	id, err := pushImage(image, url, auth)
 	if err != nil {
 		return err
 	}
