@@ -59,13 +59,9 @@ def lock(cli):
     # todo: add lockfile to git (git add --intend-to-add?)
 
 @cli.command()
-# @click.option("-t", "--tag", default="")
 @click.pass_context
 def build(cli):
     call_nix(cli, "build", "", ["--no-link"])
-    # hash = cli.invoke(load)
-    # if tag:
-    #     subprocess.run(["docker", "tag", hash, tag], check=True)
 
 
 def get_tag(cmd: str) -> str:
@@ -77,6 +73,7 @@ def get_tag(cmd: str) -> str:
     return json_content["repo_tag"]
     
 @cli.command()
+# @click.option("-t", "--tag", default="")
 @click.pass_context
 def load(cli):
     cli.invoke(build)
@@ -87,7 +84,9 @@ def load(cli):
     if subprocess.run(["docker", "image", "inspect", tag], check=False, capture_output=True).returncode == 0:
         print("Already loaded into docker:", tag)
         return tag
-    subprocess.run(f"{cmd} | docker load", check=True, shell=True)
+    subprocess.run(f"{cmd} load", check=True, shell=True)
+    # if tag:
+    #     subprocess.run(["docker", "tag", hash, tag], check=True)
     return tag
 
 @cli.command()
@@ -101,9 +100,11 @@ def run(cli, args):
 @click.argument("name", nargs=1)
 @click.pass_context
 def push(cli, name):
-    tag = cli.invoke(load)
-    subprocess.run(["docker", "tag", tag, name], check=True)
-    subprocess.run(["docker", "push", name], check=True)
+    cli.invoke(build)
+    f = call_nix(cli, "build", "", ["--json", "--no-link"], capture_output=True)
+    result = json.loads(f.stdout)
+    cmd = result[0]["outputs"]["out"]
+    subprocess.run([cmd, "push", name], check=True)
 
 @cli.command(name="push-weights")
 @click.pass_context

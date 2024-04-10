@@ -5,8 +5,8 @@ Build cog images deterministically using Nix.
 
 ## Example (./examples/torch-demo/default.nix):
 ```
-# build the image and stream it to docker
-$ nix build github:yorickvp/cognix#torch-demo && ./result | docker load
+# build the image and load it into docker
+$ nix build github:yorickvp/cognix#torch-demo && ./result load
 
 $ cog predict torch-demo:......
 
@@ -29,7 +29,7 @@ $ nix path-info ./result -rSsh | sort -hk3
 ## Example (./examples/ebsynth-cpu/default.nix):
 ```
 $ git clone ...
-$ nix build .#ebsynth-cpu && ./result | docker load
+$ nix build .#ebsynth-cpu && ./result load
 $ cog predict ebsynth-cpu:...... -i style=@...
 ```
 
