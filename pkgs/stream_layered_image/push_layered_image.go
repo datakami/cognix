@@ -200,8 +200,14 @@ func overlayBaseConfig(base_config v1.Config, final_config v1.Config) v1.Config 
 		resolved_env[parts[0]] = entry
 	}
 	final_config.Env = []string{}
-	for _, entry := range resolved_env {
-		final_config.Env = append(final_config.Env, entry)
+	// iterate in order, remove from map
+	for _, entry := range final_env {
+		parts := strings.SplitN(entry, "=", 2)
+		c, ok := resolved_env[parts[0]]
+		if ok {
+			final_config.Env = append(final_config.Env, c)
+			delete(resolved_env, parts[0])
+		}
 	}
 	return final_config
 }
