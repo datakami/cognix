@@ -4,9 +4,11 @@
     dream2nix.url = "github:yorickvp/dream2nix";
     nixpkgs.follows = "dream2nix/nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, dream2nix, nixpkgs, flake-parts }@inputs:
+  outputs = { self, dream2nix, nixpkgs, flake-parts, rust-overlay }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
       # debug = true;
@@ -51,11 +53,18 @@
             config.allowUnfree = true;
             inherit system;
             overlays = [
+              (import rust-overlay)
               (final: prev: {
                 pget = prev.callPackage ./pkgs/pget.nix { };
                 cognix-weights = prev.callPackage ./pkgs/cognix-weights {};
                 cognix-cli = prev.callPackage ./pkgs/cognix-cli {};
                 cog = prev.callPackage ./pkgs/cog.nix {};
+                uv = prev.callPackage ./pkgs/uv.nix {
+                  rustPlatform = prev.makeRustPlatform {
+                    cargo = prev.rust-bin.stable.latest.minimal;
+                    rustc = prev.rust-bin.stable.latest.minimal;
+                  };
+                };
                 lib = prev.lib.extend (finall: prevl: {
                   trivial = prevl.trivial // {
                     revisionWithDefault = default: nixpkgs.rev or default;
@@ -86,7 +95,7 @@
               path = if pkgs.lib.isDerivation path then path else "/dev/null";
             }) config.legacyPackages);
           legacyPackages = {
-            inherit (pkgs) pget cognix-weights cognix-cli cog stream_layered_image;
+            inherit (pkgs) pget cognix-weights cognix-cli cog stream_layered_image uv;
             callCognix = import ./default.nix {
               inherit pkgs dream2nix;
             };

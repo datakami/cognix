@@ -71,6 +71,7 @@ let
   pyEnvWithPip = config.python-env.public.pyEnv.override {
     postBuild = "$out/bin/python -m ensurepip";
   };
+  patchTorch = builtins.map (y: if builtins.match "torch==[0-9\.]+$" y == [] then "${y}.*" else y);
 in {
   imports = [
     ./cog-interface.nix
@@ -168,6 +169,7 @@ in {
         dream2nix.modules.dream2nix.pip
         pipOverridesModule
         (proxyLockModule config.lock.content)
+        ./uv-solver.nix
       ];
       paths = { inherit (config.paths) projectRoot package; };
       name = "cog-docker-env";
