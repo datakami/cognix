@@ -7,13 +7,13 @@ rustPlatform.buildRustPackage {
   src = fetchFromGitHub {
     owner = "yorickvP";
     repo = "uv";
-    rev = "6ef1d706379a3403d917b75d41697e98f9a0619d";
-    hash = "sha256-U4mowALk3XKSzRkhbZT333v3mVlLBpeatl8mwfeg6uw=";
+    rev = "03fa5567e96465c9e68903cb612cece6bc98228d";
+    hash = "sha256-5kqQsalnTyDuCA3JVhF0g3BOQNl159MT6raQuIBw+Cc=";
   };
   cargoLock = {
     lockFile = builtins.fetchurl {
-      url = "https://raw.githubusercontent.com/astral-sh/uv/6ef1d706379a3403d917b75d41697e98f9a0619d/Cargo.lock";
-      sha256 = "12v38b50gyi5g7dz269vl4briw5jffw16mlsmiswh0f6q8nb64q4";
+      url = "https://raw.githubusercontent.com/astral-sh/uv/03fa5567e96465c9e68903cb612cece6bc98228d/Cargo.lock";
+      sha256 = "1qy7d6lim0zjzradaakj0xrjcar6139rwklcdi9sn3z3b88c1hfz";
     };
     outputHashes = {
       "async_zip-0.0.17" = "sha256-Q5fMDJrQtob54CTII3+SXHeozy5S5s3iLOzntevdGOs=";
