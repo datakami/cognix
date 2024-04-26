@@ -76,6 +76,7 @@ in {
     ./cog-interface.nix
     ./cuda.nix
     ./stream-layered-image.nix
+    ./nix.nix
     ({ config, ... }: { public.config = config; })
   ];
   options.openapi-spec = with lib; mkOption {
@@ -98,10 +99,6 @@ in {
     cognix.environment.PYTHONUNBUFFERED = true;
     cognix.environment.LD_LIBRARY_PATH =
       lib.mkIf config.cognix.addCudaLibraryPath "/usr/lib64:/usr/local/nvidia/lib64";
-    cognix.environment.NIX_PATH = let
-      nixpkgsVer = pkgs.lib.trivial.revisionWithDefault "nixos-unstable";
-      in lib.mkIf config.cognix.includeNix
-      "nixpkgs=https://github.com/nixos/nixpkgs/archive/refs/heads/${nixpkgsVer}.tar.xz";
     # allow overriding via extendModules
     public.extendModules = extendModules;
 
@@ -119,8 +116,7 @@ in {
           fakePip
           glibc.out
           curl
-        ] ++ resolvedSystemPackages
-        ++ (lib.optional config.cognix.includeNix pkgs.pkgsStatic.nix);
+        ] ++ resolvedSystemPackages;
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
         Env = lib.mapAttrsToList (name: val: "${name}=${toString val}") config.cognix.environment;
@@ -139,7 +135,6 @@ in {
           # have been built anyways.
         };
       };
-      includeNixDB = config.cognix.includeNix;
       # needed for gpu:
       # fixed in https://github.com/NixOS/nixpkgs/pull/260063
       extraCommands = ''
