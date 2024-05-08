@@ -23,9 +23,13 @@
       flake.lib.cognixFlake = { self, cognix, ... }:
         packages: {
           packages.x86_64-linux = let
+            sourceRev = self.sourceInfo.rev or self.sourceInfo.dirtyRev or null;
             calledPackages = builtins.mapAttrs (name: path:
               cognix.legacyPackages.x86_64-linux.callCognix {
                 paths.projectRoot = self;
+                dockerTools.streamLayeredImage.config = nixpkgs.lib.mkIf (sourceRev != null) {
+                  Labels."org.opencontainers.image.revision" = sourceRev;
+                };
                 inherit name;
               } path) packages;
           in if (builtins.length (builtins.attrNames calledPackages) == 1) then
@@ -46,8 +50,12 @@
         };
       perSystem = { system, pkgs, config, ... }:
         let
+          sourceRev = self.sourceInfo.rev or self.sourceInfo.dirtyRev or null;
           callCognix = config.legacyPackages.callCognix {
             paths.projectRoot = ./.;
+            dockerTools.streamLayeredImage.config = nixpkgs.lib.mkIf (sourceRev != null) {
+              Labels."org.opencontainers.image.revision" = sourceRev;
+            };
           };
         in {
           _module.args.pkgs = import nixpkgs {
