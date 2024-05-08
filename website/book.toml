@@ -1,0 +1,23 @@
+[book]
+authors = ["Yorick van Pelt", "Various contributors"]
+language = "en"
+multilingual = false
+src = "src"
+title = "cognix"
+
+[output.html]
+git-repository-url = "https://github.com/datakami/cognix"
+edit-url-template = "https://github.com/datakami/cognix/edit/main/modules/{path}"
+no-section-label = true
+additional-css = [ "style.css" ]
+# additional-js = [ "no-edit-options.js" ]
+
+[output.html.print]
+enable = false  # big single page; don't need that
+
+[output.linkcheck]
+follow-web-links = false # no Internet during the build
+
+[preprocessor.toc]
+command = "mdbook-toc"
+renderer = ["html"]

@@ -10,6 +10,7 @@
 
   outputs = { self, dream2nix, nixpkgs, flake-parts, rust-overlay }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ ./website/flake-part.nix ];
       systems = [ "x86_64-linux" ];
       # debug = true;
       flake.templates.default = {
