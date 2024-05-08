@@ -67,7 +67,6 @@ let
   pyEnvWithPip = config.python-env.public.pyEnv.override {
     postBuild = "$out/bin/python -m ensurepip";
   };
-  patchTorch = builtins.map (y: if builtins.match "torch==[0-9\.]+$" y == [] then "${y}.*" else y);
 in {
   imports = [
     dream2nix.modules.dream2nix.core

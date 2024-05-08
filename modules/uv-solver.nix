@@ -5,17 +5,17 @@ let
   # https://github.com/astral-sh/uv/issues/3276
   patchTorch = builtins.map
     (y: if builtins.match "torch==[0-9.]+$" y == [ ] then "${y}.*" else y);
-  constraintsArgs = lib.optionals (cfg.constraints != [ ]) [
+  constraintsArgs = lib.optionals (cfg.constraintsList != [ ]) [
     "--constraint"
     (builtins.toFile "constraints.txt" (lib.concatMapStrings (x: ''
       ${x}
-    '') cfg.constraints))
+    '') cfg.constraintsList))
   ];
-  overridesArgs = lib.optionals (cfg.overrides != [ ]) [
+  overridesArgs = lib.optionals (cfg.overridesList != [ ]) [
     "--override"
     (builtins.toFile "overrides.txt" (lib.concatMapStrings (x: ''
       ${x}
-    '') cfg.overrides))
+    '') cfg.overridesList))
   ];
   extraArgs = constraintsArgs ++ overridesArgs ++ cfg.uv.extraArgs;
 in {
@@ -28,21 +28,21 @@ in {
         description = "Extra arguments to pass the the `uv` solver.";
       };
     };
-    constraints = mkOption {
+    constraintsList = mkOption {
       type = types.listOf types.str;
       description = ''
-        Constrain versions using the given requirements files.
+        Constrain versions using the given requirements.
 
-        Constraints files are `requirements.txt`-like files that only control the _version_ of a requirement that's installed. However, including a package in a constraints file will _not_ trigger the installation of that package.
+        Constraints are `requirements.txt`-like entries that only control the _version_ of a requirement that's installed. However, including a package in constraints will _not_ trigger the installation of that package.
       '';
       default = [ ];
     };
-    overrides = mkOption {
+    overridesList = mkOption {
       type = types.listOf types.str;
       description = ''
         Override versions using the given requirements files.
 
-        Overrides files a specific version of a requirement to be installed, regardless of the requirements declared by any constituent package, and regardless of whether this would be considered an invalid resolution.
+        Overrides specify a specific version of a requirement to be installed, regardless of the requirements declared by any constituent package, and regardless of whether this would be considered an invalid resolution.
 
         While constraints are _additive_, in that they're combined with the requirements of the constituent packages, overrides are _absolute_, in that they completely replace the requirements of the constituent packages.
       '';
@@ -52,9 +52,9 @@ in {
   config = lib.mkMerge [
     {
       assertions = [{
-        assertion = (cfg.constraints != [ ] || cfg.overrides != [ ]) -> cfg.uv.enable;
+        assertion = (cfg.constraintsList != [ ] || cfg.overridesList != [ ]) -> cfg.uv.enable;
         message =
-          "specifying pip constraints or overrides requires the `uv` solver via pip.uv.enable = true";
+          "specifying pip constraintsList or overridesList requires the `uv` solver via pip.uv.enable = true";
       }];
     }
     (lib.mkIf cfg.uv.enable {
