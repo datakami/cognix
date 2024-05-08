@@ -132,6 +132,14 @@ in
         Specify a path to openapi.json added to the image. Defaults to the spec generated using python -m cog.command.openapi_schema.
       '';
     };
+    python_root_packages = mkOption {
+      type = types.nullOr (types.listOf types.str);
+      default = null;
+      example = [ "nvidia-pytriton" "transformers" "tokenizers" ];
+      description = ''
+        Only include the dependencies of these python packages in the final image. This allows you to build multiple images with the same `lock.json`, containing different subsets of python packages.
+      '';
+    };
   };
   options.python-env = with lib; mkOption {
     description = ''

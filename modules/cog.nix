@@ -179,6 +179,8 @@ in {
         #requirementsList = [ "${./inputs}/cog-0.0.1.dev-py3-none-any.whl" ];
         flattenDependencies = true; # todo: why?
         drvs = { };
+        rootDependencies = lib.mkIf (config.cognix.python_root_packages != null)
+          (lib.mkForce (lib.genAttrs ([ "cog" ] ++ config.cognix.python_root_packages) (x: true)));
       };
     };
   };
