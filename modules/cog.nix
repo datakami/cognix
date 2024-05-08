@@ -76,9 +76,6 @@ in {
     ./stream-layered-image.nix
     ./nix.nix
   ];
-  options.openapi-spec = with lib; mkOption {
-    type = types.path;
-  };
   config = {
     cognix.systemPackages = {
       inherit (pkgs) pget;
@@ -145,15 +142,18 @@ in {
             "run.cog.openapi_schema": $openapi_schema
           } }
         }
-      '' { openapi_schema = config.openapi-spec; };
+      '' { openapi_schema = config.cognix.openapi_schema; };
     };
+
     lock = {
       inherit (config.python-env.public.config.lock) fields invalidationData;
     };
-    openapi-spec = lib.mkDefault (pkgs.runCommand "openapi.json" cognixcfg.environment ''
+
+    cognix.openapi_schema = lib.mkDefault (pkgs.runCommand "openapi.json" cognixcfg.environment ''
       cd ${entirePackage}/src
       ${pyEnvWithPip}/bin/python -m cog.command.openapi_schema > $out
     '');
+
     python-env = {
       imports = [
         dream2nix.modules.dream2nix.pip

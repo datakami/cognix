@@ -126,6 +126,12 @@ in
         Set these environment variables in the image.
       '';
     };
+    openapi_schema = mkOption {
+      type = types.path;
+      description = ''
+        Specify a path to openapi.json added to the image. Defaults to the spec generated using python -m cog.command.openapi_schema.
+      '';
+    };
   };
   options.python-env = with lib; mkOption {
     description = ''
