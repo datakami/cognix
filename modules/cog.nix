@@ -1,4 +1,4 @@
-{ config, lib, dream2nix, pkgs, extendModules, ... }:
+{ config, lib, dream2nix, pkgs, ... }:
 let
   cognixcfg = config.cognix;
   cfg = config.cog.build;
@@ -33,10 +33,6 @@ let
       > $out/src/cog.yaml
     ${cognixcfg.postCopyCommands}
   '';
-  # add org.cogmodel and run.cog prefixes to attr set
-  mapAttrNames = f: set:
-    lib.listToAttrs (map (attr: { name = f attr; value = set.${attr}; }) (lib.attrNames set));
-  addLabelPrefix = labels: (mapAttrNames (x: "run.cog.${x}") labels) // (mapAttrNames (x: "org.cogmodel.${x}") labels);
   # hack: replicate calls "pip -U cog" before starting
   fakePip = pkgs.writeShellScriptBin "pip" ''
     echo "this is not a pip (cognix)"
@@ -122,11 +118,10 @@ in {
         EXPOSE = 5000;
         CMD = [ "python" "-m" "cog.server.http" ];
         WorkingDir = "/src";
-        # todo: my cog doesn't like run.cog.config
-        Labels = addLabelPrefix {
-          has_init = "true";
-          config = builtins.toJSON config.cog;
-          cog_version = "${cfg.cog_version}";
+        Labels = {
+          "run.cog.has_init" = "true";
+          "run.cog.config" = builtins.toJSON config.cog;
+          "run.cog.cog_version" = "${cfg.cog_version}";
           # Initially we had openapi_schema here, but there is a problem with doing that:
           # builtins.readFile has to generate the file to read the contents,
           # and so computing the hash would require building most of the dependencies.
@@ -134,10 +129,8 @@ in {
           # have been built anyways.
         };
       };
-      # needed for gpu:
-      # fixed in https://github.com/NixOS/nixpkgs/pull/260063
+      # needed for pget, python
       extraCommands = ''
-        mkdir tmp
         mkdir -p var/run run
         ln -s ca-bundle.crt etc/ssl/certs/ca-certificates.crt
       '';
@@ -149,8 +142,7 @@ in {
       extraJSONFile = generateJSON ''
         {
           config: { Labels: {
-            "run.cog.openapi_schema": $openapi_schema,
-            "org.cogmodel.openapi_schema": $openapi_schema
+            "run.cog.openapi_schema": $openapi_schema
           } }
         }
       '' { openapi_schema = config.openapi-spec; };
