@@ -79,7 +79,6 @@ in {
     ./cuda.nix
     ./stream-layered-image.nix
     ./nix.nix
-    ({ config, ... }: { public.config = config; })
   ];
   options.openapi-spec = with lib; mkOption {
     type = types.path;
@@ -101,8 +100,6 @@ in {
     cognix.environment.PYTHONUNBUFFERED = true;
     cognix.environment.LD_LIBRARY_PATH =
       lib.mkIf config.cognix.addCudaLibraryPath "/usr/lib64:/usr/local/nvidia/lib64";
-    # allow overriding via extendModules
-    public.extendModules = extendModules;
 
     dockerTools.streamLayeredImage = {
       passthru.entirePackage = entirePackage;

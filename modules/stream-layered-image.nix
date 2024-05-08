@@ -130,17 +130,29 @@ in
     };
   };
 
-  config.public = let
-    orig_stream = packageSets.nixpkgs.dockerTools.streamLayeredImage {
-      inherit (config) name;
-      inherit (cfg)
-        tag fromImage contents config architecture
-        created extraCommands fakeRootCommands enableFakechroot
-        maxLayers includeStorePaths passthru;
-    };
+  imports = [
+    dream2nix.modules.dream2nix.package-func
+    dream2nix.modules.dream2nix.deps
+  ];
+
+  config.deps = { nixpkgs, ... }: {
+    inherit (nixpkgs.dockerTools) streamLayeredImage;
+  };
+  config.package-func.args = {
+    inherit (config) name;
+    inherit (cfg)
+      tag fromImage contents config architecture
+      created extraCommands fakeRootCommands enableFakechroot
+      maxLayers includeStorePaths passthru;
+  };
+  config.package-func.outputs = [ "out" ];
+
+  config.package-func.func = args: let
+    orig_stream = config.deps.streamLayeredImage args;
   in
-    (patchLayeredImage orig_stream cfg.extraJSONFile) // { inherit (config) name; };
+    (patchLayeredImage orig_stream cfg.extraJSONFile);
   # todo base json, customisation layer deps!
+  # https://github.com/NixOS/nixpkgs/pull/308822
   config.dockerTools.streamLayeredImage.extraCommands = lib.mkIf cfg.includeNixDB ''
     echo "Generating the nix database..."
     echo "Warning: only the database of the deepest Nix layer is loaded."
