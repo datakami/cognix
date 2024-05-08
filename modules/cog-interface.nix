@@ -140,6 +140,15 @@ in
         Only include the dependencies of these python packages in the final image. This allows you to build multiple images with the same `lock.json`, containing different subsets of python packages.
       '';
     };
+    fake_pip = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Install a fake pip wrapper that does nothing.
+
+        This is useful because replicate calls `pip install cog==...` before starting your image, which you may not want when using a patched version of cog's python library.
+      '';
+    };
   };
   options.python-env = with lib; mkOption {
     description = ''

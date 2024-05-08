@@ -104,7 +104,7 @@ in {
           cacert
           pyEnvWithPip
           entirePackage
-          fakePip
+          (if config.cognix.fake_pip then fakePip else null)
           glibc.out
           curl
         ] ++ resolvedSystemPackages;
