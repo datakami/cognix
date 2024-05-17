@@ -37,11 +37,6 @@ let
   mapAttrNames = f: set:
     lib.listToAttrs (map (attr: { name = f attr; value = set.${attr}; }) (lib.attrNames set));
   addLabelPrefix = labels: (mapAttrNames (x: "run.cog.${x}") labels) // (mapAttrNames (x: "org.cogmodel.${x}") labels);
-  # hack: replicate calls "pip -U cog" before starting
-  fakePip = pkgs.writeShellScriptBin "pip" ''
-    echo "this is not a pip (cognix)"
-    echo "hint: python -m pip"
-  '';
   # resolve system_packages to cognix.systemPackages
   resolvedSystemPackages = map (pkg:
     if lib.isDerivation pkg then pkg else
@@ -115,7 +110,6 @@ in {
           cacert
           pyEnvWithPip
           entirePackage
-          fakePip
           glibc.out
           curl
         ] ++ resolvedSystemPackages;
