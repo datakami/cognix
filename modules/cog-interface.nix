@@ -142,7 +142,7 @@ in
     };
     fake_pip = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
       description = ''
         Install a fake pip wrapper that does nothing.
 
