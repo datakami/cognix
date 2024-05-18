@@ -9,6 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@a56e3a80896f10bfe28feea2c49695c0225b2485
