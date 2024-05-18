@@ -104,10 +104,9 @@ in {
           cacert
           pyEnvWithPip
           entirePackage
-          (if config.cognix.fake_pip then fakePip else null)
           glibc.out
           curl
-        ] ++ resolvedSystemPackages;
+        ] ++ (lib.optional config.cognix.fake_pip fakePip) ++ resolvedSystemPackages;
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
         Env = lib.mapAttrsToList (name: val: "${name}=${toString val}") config.cognix.environment;
