@@ -65,7 +65,10 @@ let
   };
   toCogPythonVersion = builtins.replaceStrings ["-alpha" "-beta"] ["a" "b"];
   pyEnvWithPip = config.python-env.public.pyEnv.override {
-    postBuild = "$out/bin/python -m ensurepip";
+    postBuild = ''
+      $out/bin/python -m ensurepip
+      ln -s $out/bin/pip3 $out/bin/pip
+    '';
   };
 in {
   imports = [
@@ -102,11 +105,12 @@ in {
           bashInteractive
           busybox
           cacert
+        ] ++ (lib.optional config.cognix.fake_pip fakePip) ++ [
           pyEnvWithPip
           entirePackage
           glibc.out
           curl
-        ] ++ (lib.optional config.cognix.fake_pip fakePip) ++ resolvedSystemPackages;
+        ] ++ resolvedSystemPackages;
       config = {
         Entrypoint = [ "${pkgs.tini}/bin/tini" "--" ];
         Env = lib.mapAttrsToList (name: val: "${name}=${toString val}") config.cognix.environment;
