@@ -128,9 +128,9 @@ in {
           # have been built anyways.
         };
       };
-      # needed for pget, python
+      # needed for pget, python (certs), nix (/tmp)
       extraCommands = ''
-        mkdir -p var/run run
+        mkdir -p var/run run tmp
         ln -s ca-bundle.crt etc/ssl/certs/ca-certificates.crt
       '';
       streamScript = pkgs.writeShellScript "stream" ''

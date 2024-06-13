@@ -52,6 +52,8 @@ in
         mkdir -p etc/nix
         cp ${builtins.toFile "nix.conf" nixConfig} etc/nix/nix.conf
         cp ${builtins.toFile "registry.json" registry} etc/nix/registry.json
+        mkdir -p .config/nixpkgs
+        echo '{ allowUnfree = true; }' > .config/nixpkgs/config.nix
       '';
     };
 
