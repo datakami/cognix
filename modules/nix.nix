@@ -3,6 +3,7 @@ let
   cfg = config.cognix;
   nixConfig = ''
     experimental-features = nix-command flakes
+    ${cfg.nix.extraOptions}
   '';
   registry = builtins.toJSON {
     version = 2;
@@ -30,6 +31,16 @@ in
       description = ''
         Whether to add Nix to the image so it can be used to install more packages at run-time.
         This also sets the NIX_PATH so nixpkgs points to the nixpkgs used in cognix.
+      '';
+    };
+    nix.extraOptions = mkOption {
+      type = types.lines;
+      default = "";
+      example = ''
+        cores = 4
+      '';
+      description = ''
+        Additional text appended to {file}`nix.conf` inside the image, when includeNix = true.
       '';
     };
   };
