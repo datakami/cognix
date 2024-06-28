@@ -1,7 +1,7 @@
 {
   description = "Building cog images deterministically using Nix";
   inputs = {
-    dream2nix.url = "github:yorickvp/dream2nix";
+    dream2nix.url = "github:nix-community/dream2nix";
     nixpkgs.follows = "dream2nix/nixpkgs";
     flake-parts.url = "github:hercules-ci/flake-parts";
     rust-overlay.url = "github:oxalica/rust-overlay";
