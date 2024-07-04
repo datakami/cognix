@@ -9,18 +9,6 @@
     system,
     ...
   }: let
-#     modules' = self.inputs.dream2nix.modules.dream2nix;
-#     modules = (lib.filterAttrs (name: _: ! lib.elem name excludes) modules') // {
-#       stream-layered-image = ../modules/stream-layered-image.nix;
-#       cognix = ../modules/cog-interface.nix;
-#       # uv-solver = ../modules/uv-solver.nix;
-#       weights = ../modules/weights/interface.nix;
-#     };
-#     public = lib.genAttrs [
-#       "pip"
-#       "cognix"
-#       "weights"
-#     ] (name: null);
   isDirectory = path:
     let
       dirName = builtins.dirOf path;
@@ -30,10 +18,8 @@
       builtins.hasAttr baseName dirContent &&
       dirContent.${baseName} == "directory";
 
-# let
     inherit (inputs) dream2nix;
-    dream2nixRoot = ./..;
-    baseUrl = "https://github.com/nix-community/dream2nix/blob/master";
+    d2nUrl = "https://github.com/nix-community/dream2nix/blob/master";
     cognixUrl = "https://github.com/datakami/cognix/blob/main";
 
     getOptions = {modules}: let
@@ -68,7 +54,7 @@
             decl: let
               declstr = toString decl;
             in {
-              url = lib.replaceStrings [ (toString dream2nix) (toString self) ] [ baseUrl cognixUrl ] declstr;
+              url = lib.replaceStrings [ (toString dream2nix) (toString self) ] [ d2nUrl cognixUrl ] declstr;
               name = lib.replaceStrings [ (toString dream2nix) (toString self) ] [ "dream2nix" "cognix" ] declstr;
             }
           )
