@@ -6,7 +6,7 @@ let
   # conditional overrides: only active when a lib is in use
   pipOverridesModule = { config, lib, ... }:
     let
-      overrides = import ./../overrides.nix;
+      overrides = import ./../../overrides.nix;
       metadata = config.lock.content.fetchPipMetadata.sources;
     in {
       pip.drvs = lib.mapAttrs (name: info: overrides.${name} or { }) metadata;
@@ -73,9 +73,9 @@ let
 in {
   imports = [
     dream2nix.modules.dream2nix.core
-    ./cog-interface.nix
+    ./interface.nix
     ./cuda.nix
-    ./stream-layered-image.nix
+    ../stream-layered-image
     ./nix.nix
   ];
   config = {
@@ -161,7 +161,7 @@ in {
         dream2nix.modules.dream2nix.pip
         pipOverridesModule
         (proxyLockModule config.lock.content)
-        ./uv-solver.nix
+        ../pip-uv
       ];
       paths = { inherit (config.paths) projectRoot package; };
       name = "cog-docker-env";

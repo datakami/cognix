@@ -41,5 +41,5 @@ args: package:
 dream2nix.lib.evalModules {
   packageSets.nixpkgs = pkgs;
   modules =
-    [ ./modules/cog.nix ./modules/weights args (packageModule package) ];
+    [ ./modules/cog ./modules/weights args (packageModule package) ];
 }

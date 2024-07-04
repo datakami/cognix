@@ -1,4 +1,4 @@
-{ lib, config, packageSets, ... }:
+{ lib, config, dream2nix, packageSets, ... }:
 let
   cfg = config.pip;
   pkgs = packageSets.nixpkgs;
@@ -49,6 +49,11 @@ in {
       default = [ ];
     };
   };
+  imports = [
+    dream2nix.modules.dream2nix.assertions
+    dream2nix.modules.dream2nix.deps
+    dream2nix.modules.dream2nix.lock
+  ];
   config = lib.mkMerge [
     {
       assertions = [{

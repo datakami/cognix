@@ -1,0 +1,8 @@
+nav:
+  - "Home": index.md
+  - "Getting Started": gettingstarted.md
+  - "Contact": contact.md
+  - Examples:
+    - examples: examples.md
+  - Reference: reference
+  
