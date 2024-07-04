@@ -8,23 +8,25 @@
       
       
       
-        <link rel="canonical" href="https://datakami.github.io/cognix/">
+        <link rel="canonical" href="https://datakami.github.io/cognix/reference/overrides/">
       
       
+        <link rel="prev" href="../mkDerivation/">
       
-        <link rel="next" href="gettingstarted/">
+      
+        <link rel="next" href="../pip/">
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.18">
     
     
       
-        <title>Cognix</title>
+        <title>overrides - Cognix</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
       
       
 
@@ -43,9 +45,9 @@
       
     
     
-      <link rel="stylesheet" href="style.css">
+      <link rel="stylesheet" href="../../style.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -64,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#cognix" class="md-skip">
+        <a href="#introduction" class="md-skip">
           Skip to content
         </a>
       
@@ -80,7 +82,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Cognix" class="md-header__button md-logo" aria-label="Cognix" data-md-component="logo">
+    <a href="../.." title="Cognix" class="md-header__button md-logo" aria-label="Cognix" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -100,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              overrides
             
           </span>
         </div>
@@ -189,7 +191,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Cognix" class="md-nav__button md-logo" aria-label="Cognix" data-md-component="logo">
+    <a href="../.." title="Cognix" class="md-nav__button md-logo" aria-label="Cognix" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -216,30 +218,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Home
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -248,94 +230,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <!--
-     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
-
-     Permission is hereby granted, free of charge, to any person obtaining a copy
-     of this software and associated documentation files (the "Software"), to
-     deal in the Software without restriction, including without limitation the
-     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-     sell copies of the Software, and to permit persons to whom the Software is
-     furnished to do so, subject to the following conditions:
-
-     The above copyright notice and this permission notice shall be included in
-     all copies or substantial portions of the Software.
-
-     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-     IN THE SOFTWARE.
--->
-
-<!-- Table of contents item -->
-<li class="md-nav__item">
-            <a href="#example-examplestorch-demodefaultnix" class="md-nav__link">
-                <span class="md-ellipsis">Example (./examples/torch-demo/default.nix):</span>
-            </a>
-         
-
-        <!-- Table of contents list -->
-        
-        
-</li>
-      
-        <!--
-     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
-
-     Permission is hereby granted, free of charge, to any person obtaining a copy
-     of this software and associated documentation files (the "Software"), to
-     deal in the Software without restriction, including without limitation the
-     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-     sell copies of the Software, and to permit persons to whom the Software is
-     furnished to do so, subject to the following conditions:
-
-     The above copyright notice and this permission notice shall be included in
-     all copies or substantial portions of the Software.
-
-     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-     IN THE SOFTWARE.
--->
-
-<!-- Table of contents item -->
-<li class="md-nav__item">
-            <a href="#example-examplesebsynth-cpudefaultnix" class="md-nav__link">
-                <span class="md-ellipsis">Example (./examples/ebsynth-cpu/default.nix):</span>
-            </a>
-         
-
-        <!-- Table of contents list -->
-        
-        
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -347,7 +241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="gettingstarted/" class="md-nav__link">
+      <a href="../../gettingstarted/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -367,7 +261,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contact/" class="md-nav__link">
+      <a href="../../contact/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -422,7 +316,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/" class="md-nav__link">
+      <a href="../../examples/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -447,17 +341,19 @@
       
   
   
+    
   
   
+  
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -471,7 +367,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Reference
@@ -485,7 +381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/buildPythonPackage/" class="md-nav__link">
+      <a href="../buildPythonPackage/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -506,7 +402,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/builtins-derivation/" class="md-nav__link">
+      <a href="../builtins-derivation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -527,7 +423,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/cognix/" class="md-nav__link">
+      <a href="../cognix/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -548,7 +444,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/mkDerivation/" class="md-nav__link">
+      <a href="../mkDerivation/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -566,10 +462,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="reference/overrides/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    overrides
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -578,6 +492,166 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <!--
+     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
+
+     Permission is hereby granted, free of charge, to any person obtaining a copy
+     of this software and associated documentation files (the "Software"), to
+     deal in the Software without restriction, including without limitation the
+     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+     sell copies of the Software, and to permit persons to whom the Software is
+     furnished to do so, subject to the following conditions:
+
+     The above copyright notice and this permission notice shall be included in
+     all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+     IN THE SOFTWARE.
+-->
+
+<!-- Table of contents item -->
+<li class="md-nav__item">
+            <a href="#introduction" class="md-nav__link">
+                <span class="md-ellipsis">Introduction</span>
+            </a>
+         
+
+        <!-- Table of contents list -->
+        
+        
+</li>
+      
+        <!--
+     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
+
+     Permission is hereby granted, free of charge, to any person obtaining a copy
+     of this software and associated documentation files (the "Software"), to
+     deal in the Software without restriction, including without limitation the
+     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+     sell copies of the Software, and to permit persons to whom the Software is
+     furnished to do so, subject to the following conditions:
+
+     The above copyright notice and this permission notice shall be included in
+     all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+     IN THE SOFTWARE.
+-->
+
+<!-- Table of contents item -->
+<li class="md-nav__item">
+            <a href="#options" class="md-nav__link">
+                <span class="md-ellipsis">Options</span>
+            </a>
+         
+
+        <!-- Table of contents list -->
+        
+        <nav class="md-nav" aria-label="Options">
+            <ul class="md-nav__list">
+                
+                <!--
+     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
+
+     Permission is hereby granted, free of charge, to any person obtaining a copy
+     of this software and associated documentation files (the "Software"), to
+     deal in the Software without restriction, including without limitation the
+     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+     sell copies of the Software, and to permit persons to whom the Software is
+     furnished to do so, subject to the following conditions:
+
+     The above copyright notice and this permission notice shall be included in
+     all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+     IN THE SOFTWARE.
+-->
+
+<!-- Table of contents item -->
+<li class="md-nav__item">
+            <a href="#overrides" class="md-nav__link">
+                <span class="md-ellipsis">overrides</span>
+            </a>
+         
+
+        <!-- Table of contents list -->
+        
+        
+</li>
+                
+                <!--
+     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
+
+     Permission is hereby granted, free of charge, to any person obtaining a copy
+     of this software and associated documentation files (the "Software"), to
+     deal in the Software without restriction, including without limitation the
+     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+     sell copies of the Software, and to permit persons to whom the Software is
+     furnished to do so, subject to the following conditions:
+
+     The above copyright notice and this permission notice shall be included in
+     all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+     IN THE SOFTWARE.
+-->
+
+<!-- Table of contents item -->
+<li class="md-nav__item">
+            <a href="#overrideall" class="md-nav__link">
+                <span class="md-ellipsis">overrideAll</span>
+            </a>
+         
+
+        <!-- Table of contents list -->
+        
+        
+</li>
+                
+            </ul>
+        </nav>
+        
+        
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -590,7 +664,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/pip/" class="md-nav__link">
+      <a href="../pip/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -611,7 +685,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/pip-uv/" class="md-nav__link">
+      <a href="../pip-uv/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -632,7 +706,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/stream-layered-image/" class="md-nav__link">
+      <a href="../stream-layered-image/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -653,7 +727,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/weights/" class="md-nav__link">
+      <a href="../weights/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -674,7 +748,7 @@
   
   
     <li class="md-nav__item">
-      <a href="." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -712,8 +786,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -745,8 +817,8 @@
 
 <!-- Table of contents item -->
 <li class="md-nav__item">
-            <a href="#example-examplestorch-demodefaultnix" class="md-nav__link">
-                <span class="md-ellipsis">Example (./examples/torch-demo/default.nix):</span>
+            <a href="#introduction" class="md-nav__link">
+                <span class="md-ellipsis">Introduction</span>
             </a>
          
 
@@ -779,12 +851,86 @@
 
 <!-- Table of contents item -->
 <li class="md-nav__item">
-            <a href="#example-examplesebsynth-cpudefaultnix" class="md-nav__link">
-                <span class="md-ellipsis">Example (./examples/ebsynth-cpu/default.nix):</span>
+            <a href="#options" class="md-nav__link">
+                <span class="md-ellipsis">Options</span>
             </a>
          
 
         <!-- Table of contents list -->
+        
+        <nav class="md-nav" aria-label="Options">
+            <ul class="md-nav__list">
+                
+                <!--
+     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
+
+     Permission is hereby granted, free of charge, to any person obtaining a copy
+     of this software and associated documentation files (the "Software"), to
+     deal in the Software without restriction, including without limitation the
+     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+     sell copies of the Software, and to permit persons to whom the Software is
+     furnished to do so, subject to the following conditions:
+
+     The above copyright notice and this permission notice shall be included in
+     all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+     IN THE SOFTWARE.
+-->
+
+<!-- Table of contents item -->
+<li class="md-nav__item">
+            <a href="#overrides" class="md-nav__link">
+                <span class="md-ellipsis">overrides</span>
+            </a>
+         
+
+        <!-- Table of contents list -->
+        
+        
+</li>
+                
+                <!--
+     Copyright (c) 2016-2024 Martin Donath <martin.donath@squidfunk.com>
+
+     Permission is hereby granted, free of charge, to any person obtaining a copy
+     of this software and associated documentation files (the "Software"), to
+     deal in the Software without restriction, including without limitation the
+     rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+     sell copies of the Software, and to permit persons to whom the Software is
+     furnished to do so, subject to the following conditions:
+
+     The above copyright notice and this permission notice shall be included in
+     all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+     IN THE SOFTWARE.
+-->
+
+<!-- Table of contents item -->
+<li class="md-nav__item">
+            <a href="#overrideall" class="md-nav__link">
+                <span class="md-ellipsis">overrideAll</span>
+            </a>
+         
+
+        <!-- Table of contents list -->
+        
+        
+</li>
+                
+            </ul>
+        </nav>
         
         
 </li>
@@ -807,72 +953,91 @@
   
 
 
-<h1 id="cognix">Cognix<a class="headerlink" href="#cognix" title="Permanent link">&para;</a></h1>
-<p>Note: This is not an officially supported Replicate product.</p>
-<p>Build <a href="https://cog.run/">cog</a> images deterministically using Nix.</p>
-<p>Nix is a tool that make it easy to build packages based on the instructions you give it using a domain-specific language. Cognix is a software toolkit that makes it easy to build <a href="https://cog.run/">cog</a> images using Nix.</p>
-<p>Cognix glues together 3 parts:
-- nixpkgs <a href="https://ryantm.github.io/nixpkgs/builders/images/dockertools/">dockerTools</a>, used to create docker images using Nix
-- <a href="https://github.com/nix-community/dream2nix">dream2nix</a>, which is used to declaratively create python environments with Nix.
-- <a href="https://cog.run/">cog</a>, wrapping the python code inside your docker image.</p>
-<p>These things are packaged into one program with a simple interface.</p>
-<h2 id="example-examplestorch-demodefaultnix">Example (./examples/torch-demo/default.nix):<a class="headerlink" href="#example-examplestorch-demodefaultnix" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp"># </span>build<span class="w"> </span>the<span class="w"> </span>image<span class="w"> </span>and<span class="w"> </span>load<span class="w"> </span>it<span class="w"> </span>into<span class="w"> </span>docker
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">$ </span>nix<span class="w"> </span>build<span class="w"> </span>github:yorickvp/cognix#torch-demo<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./result<span class="w"> </span>load
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">$ </span>cog<span class="w"> </span>predict<span class="w"> </span>torch-demo:......
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">Starting Docker image torch-demo:.... and running setup()...</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="go">Running prediction...</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="go">cuda works!</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="gp">$ </span>docker<span class="w"> </span>image<span class="w"> </span>ls<span class="w"> </span>torch-demo:....
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="go">REPOSITORY   TAG                                IMAGE ID       CREATED        SIZE</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="go">torch-demo   c209d6h86w7j7ksnjks4rkynjfw3ahwb   8fe343a42975   53 years ago   4.7GB</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="gp"># </span>explore<span class="w"> </span>the<span class="w"> </span>contribution<span class="w"> </span>of<span class="w"> </span>various<span class="w"> </span>packages<span class="w"> </span>to<span class="w"> </span>the<span class="w"> </span>image<span class="w"> </span>size
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="gp"># </span>format:<span class="w"> </span>store-path<span class="w">                                                           </span>own-size<span class="w">  </span>size-with-deps
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="gp">$ </span>nix<span class="w"> </span>path-info<span class="w"> </span>./result<span class="w"> </span>-rSsh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span>-hk3
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="go">[..]</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="go">/nix/store/rbrw4jb0bz54kznbwwf47lj7k77jg00j-python3.10-nvidia-cudnn-cu11-8.5.0.96        868.8M    1.4G</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="go">/nix/store/qqrzrbsgzk3bbg1pfficq5l2qnyz2b2k-python3.10-torch-2.0.1                         1.3G    4.3G</span>
-</code></pre></div>
-<h2 id="example-examplesebsynth-cpudefaultnix">Example (./examples/ebsynth-cpu/default.nix):<a class="headerlink" href="#example-examplesebsynth-cpudefaultnix" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>...
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="gp">$ </span>nix<span class="w"> </span>build<span class="w"> </span>.#ebsynth-cpu<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./result<span class="w"> </span>load
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="gp">$ </span>cog<span class="w"> </span>predict<span class="w"> </span>ebsynth-cpu:......<span class="w"> </span>-i<span class="w"> </span><span class="nv">style</span><span class="o">=</span>@...
-</code></pre></div>
-<h1 id="why">Why?<a class="headerlink" href="#why" title="Permanent link">&para;</a></h1>
-<ul>
-<li>Smaller images, they only contain the packages needed at runtime.</li>
-<li>Determinism! Building an image twice on different machines should give you the exact same image, even after years.</li>
-<li>Completeness: The dependencies for an image are fully specified, so there are no build steps you don't know about.</li>
-<li>Better, granular caching: Nix generates a docker image with a layer for every dependency (up to ~limit, then it starts merging cleverly), images sharing dependencies will share layers as well.</li>
-</ul>
-<h1 id="checklist">Checklist<a class="headerlink" href="#checklist" title="Permanent link">&para;</a></h1>
-<ul class="task-list">
-<li class="task-list-item"><input type="checkbox" disabled checked/> GPU support</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Automatically parsing cog.yaml</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Auto-resolving torch/cuda versions</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Better ergonomics: module system</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Fully sort out cog/r8 compat</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Other python versions than 3.10</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> System dependencies mapping</li>
-<li class="task-list-item"><input type="checkbox" disabled/> <code>cog.yaml</code> run commands</li>
-<li class="task-list-item"><input type="checkbox" disabled/> Support upgrading <code>cog</code> at runtime</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Downloading weights at build-time (example(./examples/gte-small/cog.yaml))</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Uploading weights to gcs bucket (<code>nix run .#gte-large.push-weights</code>)</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Downloading weights at run-time (example(./examples/gte-large))</li>
-<li class="task-list-item"><input type="checkbox" disabled checked/> Generating openapi.yaml during the build</li>
-<li class="task-list-item"><input type="checkbox" disabled/> Automatically download weights at run-time</li>
-<li class="task-list-item"><input type="checkbox" disabled/> Ergonomic interface</li>
-</ul>
+  <h1>overrides</h1>
+
+<table style="float: right;">
+    <tr>
+        <td>state:</td>
+        <td>released</td>
+    </tr>
+    <tr>
+        <td>maintainers:</td>
+        <td>
+            <a href="https://github.com/DavHau">@DavHau</a>
+        </td>
+    </tr>
+</table>
+
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<h2 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h2>
+<h3 id="overrides">overrides<a class="headerlink" href="#overrides" title="Permanent link">&para;</a></h3>
+<p>Overrides applied only on dependencies matching the specified name.</p>
+<table>
+    <tr>
+        <td>type</td>
+        <td>attribute set of module </td>
+    </tr>
+    <tr>
+        <td>source</td>
+        <td><a href="https://github.com/nix-community/dream2nix/blob/master/modules/dream2nix/overrides/interface.nix">dream2nix/modules/dream2nix/overrides/interface.nix</a></td>
+    </tr><tr>
+        <td>default</td>
+        <td><div class="highlight"><pre><span></span><span class="p">{</span> <span class="p">}</span>
+</pre></div>
+</td>
+    </tr><tr>
+        <td>example</td>
+        <td>
+            <div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="ss">hello</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="ss">mkDerivation</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="ss">postPatch</span> <span class="o">=</span> <span class="s s-Multiline">&#39;&#39;</span>
+<span class="s s-Multiline">        substituteInPlace Makefile --replace /usr/local /usr</span>
+<span class="s s-Multiline">      &#39;&#39;</span><span class="p">;</span>
+    <span class="p">};</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+
+        </td>
+    </tr></table>
+
+<h3 id="overrideall">overrideAll<a class="headerlink" href="#overrideall" title="Permanent link">&para;</a></h3>
+<p>Overrides applied on all dependencies.</p>
+<table>
+    <tr>
+        <td>type</td>
+        <td>module </td>
+    </tr>
+    <tr>
+        <td>source</td>
+        <td><a href="https://github.com/nix-community/dream2nix/blob/master/modules/dream2nix/overrides/interface.nix">dream2nix/modules/dream2nix/overrides/interface.nix</a></td>
+    </tr><tr>
+        <td>default</td>
+        <td><div class="highlight"><pre><span></span><span class="p">{</span> <span class="p">}</span>
+</pre></div>
+</td>
+    </tr><tr>
+        <td>example</td>
+        <td>
+            <div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="ss">mkDerivation</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="ss">doCheck</span> <span class="o">=</span> <span class="no">false</span><span class="p">;</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+
+        </td>
+    </tr></table>
 
 
 
 
 
 
+
+  
+  
 
 
 
@@ -933,10 +1098,10 @@
       <div class="md-progress" data-md-component="progress" role="progressbar"></div>
     
     
-    <script id="__config" type="application/json">{"base": ".", "features": ["search.suggest", "search.highlight", "instant", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.tracking", "navigation.path", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["search.suggest", "search.highlight", "instant", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.tracking", "navigation.path", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="assets/javascripts/bundle.3220b9d7.min.js"></script>
+      <script src="../../assets/javascripts/bundle.3220b9d7.min.js"></script>
       
     
   </body>
