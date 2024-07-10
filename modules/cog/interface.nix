@@ -56,7 +56,7 @@ in
       };
       cog_version = mkOption {
         type = types.str;
-        default = "0.9.4";
+        default = "0.9.12";
         description = "The cog-python version to add to the image.";
       };
     };
