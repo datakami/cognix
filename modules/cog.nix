@@ -119,7 +119,7 @@ in {
         WorkingDir = "/src";
         Labels = {
           "run.cog.has_init" = "true";
-          "run.cog.config" = builtins.toJSON config.cog;
+          "run.cog.config" = builtins.toJSON (lib.filterAttrs (_: x: x != null) config.cog);
           "run.cog.version" = "${cfg.cog_version}";
           # Initially we had openapi_schema here, but there is a problem with doing that:
           # builtins.readFile has to generate the file to read the contents,
