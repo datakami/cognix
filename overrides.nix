@@ -7,7 +7,7 @@
 
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/python-modules/torch/fix-cmake-cuda-toolkit.patch
     mkDerivation.postInstall = ''
-      rm $out/${config.deps.python3.sitePackages}/torch/share/cmake/Caffe2/FindCUDAToolkit.cmake
+      rm $out/${config.deps.python.sitePackages}/torch/share/cmake/Caffe2/FindCUDAToolkit.cmake
     '';
     # seems to be a bug in the torch-cu117 package
     env.autoPatchelfIgnoreMissingDeps = [ "libnvToolsExt.so.1" ];
