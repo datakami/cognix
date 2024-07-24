@@ -1,7 +1,8 @@
 {
   cog.build.python_snapshot_date = "2023-10-05";
   cog.build.cog_version = "0.8.6";
-  python-env.pip.drvs.torch.mkDerivation.postInstall = ''
+  python-env.pip.uv.enable = false;
+  python-env.pip.drvs.torch.mkDerivation.postFixup = ''
     rm $out/lib/python*/site-packages/torch/lib/lib{caffe2_nvrtc,torch_cuda_linalg}.so
   '';
 }

@@ -21,7 +21,11 @@ let
 in {
   options.pip = with lib; {
     uv = {
-      enable = mkEnableOption "use uv solver";
+      enable = mkOption {
+        type = types.bool;
+        description = "use uv solver";
+        default = true;
+      };
       extraArgs = mkOption {
         type = types.listOf types.str;
         default = [ ];
@@ -87,6 +91,12 @@ in {
         '';
       lock.invalidationData.solver = "uv";
       lock.invalidationData.extraArgs = extraArgs;
+
+      # workaround uv not having git hashes yet
+      deps.fetchgit = {
+        url, rev, sha256
+      }: builtins.fetchGit { inherit url rev; }; # allRefs = true; };
+
     })
   ];
 }

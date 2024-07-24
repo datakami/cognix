@@ -44,16 +44,16 @@
         "version": "0.98.0"
       },
       "filelock": {
-        "sha256": "08c21d87ded6e2b9da6728c3dff51baf1dcecf973b768ef35bcbc3447edb9ad4",
+        "sha256": "57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c",
         "type": "url",
-        "url": "https://files.pythonhosted.org/packages/5e/5d/97afbafd9d584ff1b45fcb354a479a3609bd97f912f8f1f6c563cb1fae21/filelock-3.12.4-py3-none-any.whl",
-        "version": "3.12.4"
+        "url": "https://download.pytorch.org/whl/filelock-3.13.1-py3-none-any.whl",
+        "version": "3.13.1"
       },
       "fsspec": {
-        "sha256": "603dbc52c75b84da501b9b2ec8c11e1f61c25984c4a0dda1f129ef391fbfc9b4",
+        "sha256": "817f969556fa5916bc682e02ca2045f96ff7f586d45110fcb76022063ad2c7d8",
         "type": "url",
-        "url": "https://files.pythonhosted.org/packages/fe/d3/e1aa96437d944fbb9cc95d0316e25583886e9cd9e6adc07baad943524eda/fsspec-2023.9.2-py3-none-any.whl",
-        "version": "2023.9.2"
+        "url": "https://download.pytorch.org/whl/fsspec-2024.2.0-py3-none-any.whl",
+        "version": "2024.2.0"
       },
       "h11": {
         "sha256": "e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761",
@@ -80,16 +80,16 @@
         "version": "3.4"
       },
       "jinja2": {
-        "sha256": "6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61",
+        "sha256": "7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa",
         "type": "url",
-        "url": "https://download.pytorch.org/whl/Jinja2-3.1.2-py3-none-any.whl",
-        "version": "3.1.2"
+        "url": "https://download.pytorch.org/whl/Jinja2-3.1.3-py3-none-any.whl",
+        "version": "3.1.3"
       },
       "markupsafe": {
-        "sha256": "bfce63a9e7834b12b87c64d6b155fdd9b3b96191b6bd334bf37db7ff1fe457f2",
+        "sha256": "b91c037585eba9095565a3556f611e3cbfaa42ca1e865f7b8015fe5c7336d5a5",
         "type": "url",
-        "url": "https://files.pythonhosted.org/packages/fe/21/2eff1de472ca6c99ec3993eab11308787b9879af9ca8bbceb4868cf4f2ca/MarkupSafe-2.1.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-        "version": "2.1.3"
+        "url": "https://download.pytorch.org/whl/MarkupSafe-2.1.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "version": "2.1.5"
       },
       "mpmath": {
         "sha256": "a0b2b9fe80bbcd81a6647ff13108738cfb482d481d826cc0e02f5b35e5c88d2c",
@@ -98,16 +98,16 @@
         "version": "1.3.0"
       },
       "networkx": {
-        "sha256": "4f33f68cb2afcf86f28a45f43efc27a9386b535d567d2127f8f61d51dec58d36",
+        "sha256": "f18c69adc97877c42332c170849c96cefa91881c99a7cb3e95b7c659ebdc1ec2",
         "type": "url",
-        "url": "https://files.pythonhosted.org/packages/a8/05/9d4f9b78ead6b2661d6e8ea772e111fc4a9fbd866ad0c81906c11206b55e/networkx-3.1-py3-none-any.whl",
-        "version": "3.1"
+        "url": "https://download.pytorch.org/whl/networkx-3.2.1-py3-none-any.whl",
+        "version": "3.2.1"
       },
       "numpy": {
-        "sha256": "e062aa24638bb5018b7841977c360d2f5917268d125c833a686b7cbabbec496c",
+        "sha256": "f25e2811a9c932e43943a2615e65fc487a0b6b49218899e62e426e7f0a57eeda",
         "type": "url",
-        "url": "https://files.pythonhosted.org/packages/c4/36/161e2f8110f8c49e59f6107bd6da4257d30aff9f06373d0471811f73dcc5/numpy-1.26.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
-        "version": "1.26.0"
+        "url": "https://download.pytorch.org/whl/numpy-1.26.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "version": "1.26.3"
       },
       "packaging": {
         "sha256": "8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7",
@@ -200,10 +200,10 @@
         "version": "4.34.0"
       },
       "typing-extensions": {
-        "sha256": "8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0",
+        "sha256": "af72aea155e91adfc61c3ae9e0e342dbc0cba726d6cba4b6c72c1f34e47291cd",
         "type": "url",
-        "url": "https://files.pythonhosted.org/packages/24/21/7d397a4b7934ff4028987914ac1044d3b7d52712f30e2ac7a2ae5bc86dd0/typing_extensions-4.8.0-py3-none-any.whl",
-        "version": "4.8.0"
+        "url": "https://download.pytorch.org/whl/typing_extensions-4.9.0-py3-none-any.whl",
+        "version": "4.9.0"
       },
       "urllib3": {
         "sha256": "7a7c7003b000adf9e7ca2a377c9688bbc54ed41b985789ed576570342a375cd2",
@@ -348,10 +348,10 @@
   },
   "weights": [
     {
-      "rev": "c20abe89ac0cdf484944ebdc26ecaaa1bfc9cf89",
-      "hash": "sha256-+9iyjUF6DpJD1ISUS4j5vqYzgL9MmlyknAsXu+LDkdA=",
+      "rev": "50c7dd33df1027ef560fd504d95e277948c3c886",
+      "hash": "sha256-QYXkgRC12ZXsFGAu7VJVTJTKKdWtUtUpXKW2A7rB8z8=",
       "download_files": []
     }
   ],
-  "invalidationHash": "614060dd9590acf10389553f430d1bd5c7a78933439bbea806e81d4b1f0a1d5f"
+  "invalidationHash": "88963be99954d1fc4ea19ab82d87a2a19324d39e11fd65cefd229c14ec7ed88f"
 }
