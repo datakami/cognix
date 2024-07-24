@@ -9,7 +9,7 @@ in
     build = {
       gpu = mkEnableOption "GPU support";
       cuda = mkOption {
-        type = types.enum [ null "11.0" "11.1" "11.3" "11.5" "11.6" "11.7" "11.8" "12.1" ];
+        type = types.enum [ null "11.0" "11.1" "11.3" "11.5" "11.6" "11.7" "11.8" "12.1" "12.2" "12.3" "12.4" ];
       };
       python_version = mkOption {
         type = types.enum [ "3.8" "3.9" "3.10" "3.11" "3.12" ];
@@ -149,6 +149,30 @@ in
         Install a fake pip wrapper that does nothing.
 
         This is useful because replicate calls `pip install cog==...` before starting your image, which you may not want when using a patched version of cog's python library.
+      '';
+    };
+    cudaPackages = mkOption {
+      type = types.attrsOf types.package;
+      description = ''
+        Exposes cuda packages for your convenience
+      '';
+    };
+    merge-native.cublas = mkOption {
+      type = types.enum [ false true "force" ];
+      default = false;
+      description = ''
+        Override the binaries in nvidia-cublas-cu12 with the system-provided cublas binaries.
+        Useful to save space when mixing python binary dependencies with compiled dependencies.
+        Specify `force` to ignore version mismatches.
+      '';
+    };
+    merge-native.cudnn = mkOption {
+      type = types.enum [ false true "force" ];
+      default = false;
+      description = ''
+        Override the binaries in nvidia-cudnn-cu12 with the system-provided cublas binaries.
+        Useful to save space when mixing python binary dependencies with compiled dependencies.
+        Specify `force` to ignore version mismatches.
       '';
     };
   };
